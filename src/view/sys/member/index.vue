@@ -3,10 +3,32 @@
     <el-card style="height: 80px">
         <el-form :inline="true" class="form">
             <el-form-item label="用户名:">
-                <el-input placeholder="请你输入搜索用户名" v-model="keyword"></el-input>
+                <el-input placeholder="请输入搜索的用户名" v-model="username"></el-input>
+            </el-form-item>
+            <el-form-item label="昵称:">
+                <el-input placeholder="请输入搜索的昵称" v-model="nickname"></el-input>
+            </el-form-item>
+            <el-form-item label="手机号:">
+                <el-input placeholder="请输入搜索的手机号" v-model="phone"></el-input>
+            </el-form-item>
+            <el-form-item label="性别:">
+                <el-select v-model="gender" class="m-2" placeholder="请选择性别">
+                    <el-option label="未知" value="0" />
+                    <el-option label="男" value="1" />
+                    <el-option label="女" value="2" />
+                </el-select>
+                <!-- <el-input placeholder="请输入搜索的性别" v-model="gender"></el-input> -->
+            </el-form-item>
+            <el-form-item label="状态:">
+                <el-select v-model="status" class="m-2" placeholder="请选择状态">
+                    <el-option label="正常" value="1" />
+                    <el-option label="禁用" value="0" />
+                </el-select>
+                <!-- <el-input placeholder="请输入搜索的状态" v-model="status"></el-input> -->
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" size="default" @click="search" :disabled="keyword.length ? false : true">
+                <el-button type="primary" size="default" @click="search"
+                    :disabled="username.length || nickname.length || phone.length || gender.length || status.length ? false : true">
                     搜索
                 </el-button>
                 <el-button size="default" @click="reset">重置</el-button>
@@ -21,18 +43,44 @@
         <el-button type="danger" size="default" @click="deleteSelectUser" :disabled="selectIdArr.length ? false : true">
             批量删除
         </el-button>
-        <el-table style="margin: 10px 0" border :data="userArr" @selection-change="selectChange">
-            <el-table-column type="selection" align="center"></el-table-column>
-            <el-table-column label="id" align="center" prop="id"></el-table-column>
+        <el-table border :data="userArr" @selection-change="selectChange">
+            <el-table-column type="selection" align="center" width="30px"></el-table-column>
+            <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
+            <el-table-column label="头像" align="center" prop="avatar" show-overflow-tooltip width="60px">
+                <template #="{ row }">
+                    <img :src="row.avatar" alt="头像" style="width: 40px; height: 40px; border-radius: 50%;" />
+                </template>
+            </el-table-column>
             <el-table-column label="用户名字" align="center" prop="username" show-overflow-tooltip></el-table-column>
             <el-table-column label="用户昵称" align="center" prop="nickname" show-overflow-tooltip></el-table-column>
-            <el-table-column label="性别" align="center" prop="gender" show-overflow-tooltip></el-table-column>
-            <el-table-column label="邮箱" align="center" prop="email" show-overflow-tooltip></el-table-column>
-            <el-table-column label="用户角色" align="center" prop="roleName" show-overflow-tooltip></el-table-column>
-            <el-table-column label="创建时间" align="center" prop="creat_at" show-overflow-tooltip></el-table-column>
-            <el-table-column label="更新时间" align="center" prop="update_at" show-overflow-tooltip></el-table-column>
-            <el-table-column label="操作" width="300px" align="center">
+            <el-table-column label="性别" align="center" prop="gender" show-overflow-tooltip width="60px">
                 <template #="{ row, $index }">
+                    <template v-if="row.gender === '0'">
+                        未知
+                    </template>
+                    <template v-else-if="row.gender === '1'">
+                        男
+                    </template>
+                    <template v-else>
+                        女
+                    </template>
+                </template>
+            </el-table-column>
+            <el-table-column label="邮箱" align="center" prop="email" show-overflow-tooltip></el-table-column>
+
+            <el-table-column label="用户角色" align="center" prop="roleName" show-overflow-tooltip></el-table-column>
+            <!-- <el-table-column label="创建者" align="center" prop="creat_by" show-overflow-tooltip></el-table-column> -->
+            <el-table-column label="创建时间" align="center" prop="creat_at" show-overflow-tooltip></el-table-column>
+            <!-- <el-table-column label="更新者" align="center" prop="update_by" show-overflow-tooltip></el-table-column> -->
+            <el-table-column label="更新时间" align="center" prop="update_at" show-overflow-tooltip></el-table-column>
+            <el-table-column label="状态" align="center" prop="status" show-overflow-tooltip width="60px">
+                <template #="{ row }">
+                    <el-switch v-model="row.status" style="--el-switch-on-color: #13b8ce; " active-value="1"
+                        inactive-value="0" @change="handleChange(row)" />
+                </template>
+            </el-table-column>
+            <el-table-column label="操作" width="300px" align="center">
+                <template #="{ row }">
                     <el-button type="warning" size="small" icon="User" @click="setRole(row)">
                         分配角色
                     </el-button>
@@ -50,35 +98,48 @@
             </el-table-column>
         </el-table>
         <!-- 分页 -->
-        <el-pagination v-model:current-page="pageNo" v-model:page-size="pageSize" :page-sizes="[5, 7, 9, 11]"
+        <el-pagination v-model:current-page="pageNo" v-model:page-size="pageSize" :page-sizes="[5, 10, 15, 20]"
             :background="true" layout="prev, pager, next, jumper, -> , sizes, total" :total="total"
             @current-change="getHasUser" @size-change="handler" />
     </el-card>
     <!-- 抽屉  完成 添加｜修改 的窗口 -->
-    <el-drawer v-model="drawer">
-        <template #header>
-            <h4>{{ userParams.id ? '更新用户' : '添加用户' }}</h4>
-        </template>
-        <template #default>
-            <el-form :model="userParams" :rules="rules" ref="formRef">
-                <el-form-item label="用户姓名" prop="username">
-                    <el-input placeholder="请您输入用户姓名" v-model="userParams.username"></el-input>
-                </el-form-item>
-                <el-form-item label="用户昵称" prop="name">
-                    <el-input placeholder="请您输入用户昵称" v-model="userParams.name"></el-input>
-                </el-form-item>
-                <el-form-item label="用户密码" prop="password" v-if="!userParams.id">
-                    <el-input placeholder="请您输入用户密码" v-model="userParams.password"></el-input>
-                </el-form-item>
-            </el-form>
-        </template>
+    <el-dialog v-model="drawer" :title="userParams.id ? '更新用户' : '添加用户'">
+        <el-form :model="userParams" :rules="rules" ref="formRef" :inline="true">
+            <el-form-item label="用户名" prop="username">
+                <el-input placeholder="请您输入用户名" v-model="userParams.username"></el-input>
+            </el-form-item>
+            <el-form-item label="昵称" prop="nickname">
+                <el-input placeholder="请您输入昵称" v-model="userParams.nickname"></el-input>
+            </el-form-item>
+            <el-form-item label="手机号" prop="phone">
+                <el-input placeholder="请您输入手机号" v-model="userParams.phone"></el-input>
+            </el-form-item>
+            <el-form-item label="邮箱" prop="email">
+                <el-input placeholder="请您输入邮箱" v-model="userParams.email"></el-input>
+            </el-form-item>
+            <el-form-item label="性别" prop="gender">
+                <el-select v-model="userParams.gender" class="m-2" placeholder="请选择性别">
+                    <el-option label="未知" value="0" />
+                    <el-option label="男" value="1" />
+                    <el-option label="女" value="2" />
+                </el-select>
+                <!-- <el-input placeholder="请您输入性别" v-model="userParams.gender"></el-input> -->
+            </el-form-item>
+            <el-form-item label="状态" prop="status">
+                <el-select v-model="userParams.status" class="m-2" placeholder="请选择状态">
+                    <el-option label="正常" value="1" />
+                    <el-option label="禁用" value="0" />
+                </el-select>
+                <!-- <el-input placeholder="请您输入状态" v-model="userParams.status"></el-input> -->
+            </el-form-item>
+        </el-form>
         <template #footer>
             <div style="flex: auto">
                 <el-button @click="cancel">取消</el-button>
                 <el-button type="primary" @click="save">确定</el-button>
             </div>
         </template>
-    </el-drawer>
+    </el-dialog>
     <!-- 抽屉  职位分配 -->
     <el-drawer v-model="drawer1">
         <template #header>
@@ -96,7 +157,7 @@
                     </el-checkbox>
                     <el-checkbox-group v-model="userRole" @change="handleCheckedUsersChange">
                         <el-checkbox v-for="(role, index) in allRole" :key="index" :label="role">
-                            {{ role.roleName }}
+                            {{ role.name }}
                         </el-checkbox>
                     </el-checkbox-group>
                 </el-form-item>
@@ -119,6 +180,7 @@ import {
     reqSetUserRole,
     reqRemoveUser,
     reqSelectUser,
+    reqMenuListByUser
 } from '@/api/sys/user'
 import type {
     UserResponseData,
@@ -133,17 +195,24 @@ import { ref, onMounted, reactive, nextTick } from 'vue'
 //默认页码
 let pageNo = ref<number>(1)
 //默认个数
-let pageSize = ref<number>(5)
+let pageSize = ref<number>(10)
 let total = ref<number>(0)
 //数据列表
 let userArr = ref<Records>([])
 //收集用户查找的关键字
-let keyword = ref<string>('')
+let username = ref<string>('')
+let nickname = ref<string>('')
+let phone = ref<string>('')
+let status = ref<string>('')
+let gender = ref<string>('')
 //收集用户信息
-let userParams = reactive<User>({
+let userParams = reactive<any>({
     username: '',
-    name: '',
-    password: '',
+    nickname: '',
+    phone: '',
+    email: '',
+    status: '',
+    gender: '',
 })
 //组件实例
 let formRef = ref<any>()
@@ -152,14 +221,23 @@ const checkAll = ref<boolean>(false)
 //不确定样式
 const isIndeterminate = ref<boolean>(true)
 //所有role
-let allRole = ref<AllRole>([])
+let allRole = ref<any>([])
 // 用户role
-let userRole = ref<AllRole>([])
+let userRole = ref<any>([])
 //准备批量删除用户的id
 let selectIdArr = ref<User[]>([])
+//收集删除的id
+let ids = ref<number[]>([])
 //setting仓库
 import useLayoutSettingStore from '@/store/setting'
 let settingStore = useLayoutSettingStore()
+
+//展示男女
+let genderMap: {
+    0: '未知',
+    1: '男',
+    2: '女'
+}
 //组件挂载完毕
 onMounted(() => {
     getHasUser()
@@ -167,7 +245,14 @@ onMounted(() => {
 //获取用户信息
 const getHasUser = async (pager = 1) => {
     pageNo.value = pager
-    let res: any = await reqUserInfo(pageNo.value, pageSize.value, keyword.value)
+    let res: any = await reqUserInfo(
+        pageNo.value,
+        pageSize.value,
+        username.value,
+        phone.value,
+        nickname.value,
+        status.value,
+        gender.value)
     if (res.code == 200) {
         total.value = res.total
         userArr.value = res.data
@@ -188,8 +273,11 @@ const addUser = () => {
     Object.assign(userParams, {
         id: 0,
         username: '',
-        name: '',
-        password: '',
+        nickname: '',
+        phone: '',
+        email: '',
+        status: '',
+        gender: '',
     })
 
     //清除上一次的提示信息
@@ -268,11 +356,13 @@ const cancel = () => {
 const setRole = async (row: User) => {
     drawer1.value = true
     Object.assign(userParams, row)
-    let res: AllRoleResponseData = await reqAllRole(userParams.id as number)
+    let res: any = await reqAllRole()
     if (res.code === 200) {
-        allRole.value = res.data.allRolesList
-        userRole.value = res.data.assignRoles
-        drawer1.value = true
+        allRole.value = res.data
+    }
+    let res1: any = await reqMenuListByUser({ userID: userParams.id })
+    if (res1.code === 200) {
+        userRole.value = res1.data
     }
 }
 //点击全选框
@@ -289,15 +379,15 @@ const handleCheckedUsersChange = (value: string[]) => {
         checkedCount > 0 && checkedCount < allRole.value.length
 }
 
-//分配菜单 确定按钮
+//分配角色 确定按钮
 const confirmClick = async () => {
     let data: SetRoleData = {
-        userId: userParams.id as number,
-        roleIdList: userRole.value.map((item) => {
+        id: userParams.id as number,
+        roleId: userRole.value.map((item) => {
             return item.id as number
         }),
     }
-    let res: any = await reqSetUserRole(data)
+    let res: any = await reqAddOrUpdateUser(data)
     if (res.code === 200) {
         ElMessage({
             type: 'success',
@@ -309,7 +399,9 @@ const confirmClick = async () => {
 }
 // 删除用户按钮
 const deleteUser = async (userId: number) => {
-    let res: any = await reqRemoveUser(userId)
+    ids.value.push(userId);
+    const requestData: any = { ids: ids.value }; // 提取 ids 引用的值并构造请求数据对象
+    let res: any = await reqRemoveUser(requestData);
     if (res.code == 200) {
         ElMessage({ type: 'success', message: '删除成功' })
         getHasUser(userArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
@@ -321,10 +413,11 @@ const selectChange = (value: any) => {
 }
 //批量删除用户按钮
 const deleteSelectUser = async () => {
-    let idList: any = selectIdArr.value.map((item) => {
+    ids.value = selectIdArr.value.map((item) => {
         return item.id
     })
-    let res: any = await reqSelectUser(idList)
+    const requestData: any = { ids: ids.value };
+    let res: any = await reqRemoveUser(requestData);
     if (res.code === 200) {
         ElMessage({ type: 'success', message: '删除成功' })
         getHasUser(userArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
@@ -334,11 +427,26 @@ const deleteSelectUser = async () => {
 //搜索按钮
 const search = () => {
     getHasUser()
-    keyword.value = ''
+    username.value = ''
+    nickname.value = ''
+    email.value = ''
+    status.value = ''
+    gender.value = ''
 }
 //重置按钮
 const reset = () => {
     settingStore.refresh = !settingStore.refresh
+}
+//状态修改用户
+let handleChange = async (row: any) => {
+    let data: any = {
+        id: row.id as number,
+        status: row.status
+    }
+    let res = await reqAddOrUpdateUser(data)
+    if (res.code === 200) {
+        ElMessage({ type: 'success', message: '修改状态成功' })
+    }
 }
 </script>
 

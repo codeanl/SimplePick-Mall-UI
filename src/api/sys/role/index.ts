@@ -32,3 +32,4 @@ export const reqSetPermission = (roleId: number, permissionId: number[]) =>
 
 export const reqRemoveRole = (data: any) =>
   request.post<any, any>(API.REMOVEROLE_URL, data)
+

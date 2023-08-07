@@ -264,7 +264,7 @@ const handler = async () => {
 //删除按钮
 const removeRole = async (id: number) => {
     ids.value.push(id);
-    const requestData = { ids: ids.value }; // 提取 ids 引用的值并构造请求数据对象
+    const requestData: any = { ids: ids.value }; // 提取 ids 引用的值并构造请求数据对象
     let res: any = await reqRemoveRole(requestData);
     if (res.code === 200) {
         ElMessage({
