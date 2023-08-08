@@ -1,36 +1,60 @@
-
 <template>
-    <el-table style="width: 100%; margin-bottom: 20px" row-key="id" border :data="PermissionArr">
-        <el-table-column prop="name" label="名称" />
-        <el-table-column prop="code" label="权限值" />
-        <el-table-column prop="updateTime" label="修改时间" show-overflow-tooltip />
-        <el-table-column label="操作" width="260px">
-            <template #="{ row, $index }">
-                <el-button size="small" :disabled="row.level === 4 ? true : false" @click="addPermission(row)">
-                    {{ row.level === 3 ? '添加功能' : '添加菜单' }}
-                </el-button>
-                <el-button type="primary" size="small" :disabled="row.level === 1 ? true : false"
-                    @click="updatePermission(row)">
-                    编辑
-                </el-button>
-                <el-popconfirm :title="`你确定要删除${row.name}?`" width="260px" @confirm="removeMenu(row.id)">
-                    <template #reference>
-                        <el-button type="danger" size="small" :disabled="row.level === 1 ? true : false">
-                            删除
-                        </el-button>
-                    </template>
-                </el-popconfirm>
-            </template>
-        </el-table-column>
-    </el-table>
+    <el-card style="margin: 10px 0">
+        <el-button type="success" size="default" icon="Plus" @click="addPermission">
+            添加菜单
+        </el-button>
+        <!--  -->
+        <el-table style="width: 100%; margin-bottom: 20px" row-key="id" border :data="PermissionArr">
+            <el-table-column prop="name" label="名称" />
+            <el-table-column prop="type" label="类型" />
+            <el-table-column prop="url" label="路径" />
+            <el-table-column prop="tag" label="权限值" />
+            <el-table-column prop="orderNum" label="排序" />
+            <el-table-column prop="remark" label="备注" />
+            <el-table-column label="操作" width="260px">
+                <template #="{ row }">
+                    <el-button type="primary" size="small" @click="updatePermission(row)">
+                        编辑
+                    </el-button>
+                    <el-popconfirm :title="`你确定要删除${row.name}?`" width="260px" @confirm="removeMenu(row.id)">
+                        <template #reference>
+                            <el-button type="danger" size="small">
+                                删除
+                            </el-button>
+                        </template>
+                    </el-popconfirm>
+                </template>
+            </el-table-column>
+        </el-table>
+    </el-card>
     <!--  -->
     <el-dialog v-model="dialogVisible" :title="menuData.id ? '更新菜单' : '添加菜单'">
-        <el-form>
+        <el-form :inline="true">
             <el-form-item label="名称">
                 <el-input placeholder="请你输入菜单的名称" v-model="menuData.name"></el-input>
             </el-form-item>
-            <el-form-item label="权限">
-                <el-input placeholder="请你输入权限数值" v-model="menuData.code"></el-input>
+            <el-form-item label="类型">
+                <el-select v-model="menuData.type" class="m-2" placeholder="请选择类型">
+                    <el-option label="目录" value="1" />
+                    <el-option label="菜单" value="2" />
+                    <el-option label="按钮" value="3" />
+                </el-select>
+            </el-form-item>
+            <el-form-item label="父级id">
+                <el-tree-select v-model="menuData.parentId" :data="PermissionArrWithRoot" check-strictly
+                    :props="{ key: 'id', label: 'name' }" node-key="id" :render-after-expand="false" />
+            </el-form-item>
+            <el-form-item label="路径">
+                <el-input placeholder="请你输入路径" v-model="menuData.url"></el-input>
+            </el-form-item>
+            <el-form-item label="排序">
+                <el-input placeholder="请你输入排序" v-model="menuData.orderNum"></el-input>
+            </el-form-item>
+            <el-form-item label="TAG">
+                <el-input placeholder="请你输入TAG" v-model="menuData.tag"></el-input>
+            </el-form-item>
+            <el-form-item label="备注">
+                <el-input placeholder="请你输入备注" v-model="menuData.remark"></el-input>
             </el-form-item>
         </el-form>
         <template #footer>
@@ -41,81 +65,93 @@
         </template>
     </el-dialog>
 </template>
-
+  
 <script setup lang="ts">
-import { ref, onMounted, reactive } from 'vue'
+import { ref, onMounted, reactive, computed } from 'vue';
+import { ElTreeSelect, ElMessage } from 'element-plus';
 import {
     reqAllPermission,
     reqAddOrUpdateMenu,
     reqRemoveMenu,
-} from '@/api/sys/menu'
-import type {
-    PermissionResponseData,
-    PermissionList,
-    Permission,
-    MenuParams,
-} from '@/api/sys/menu/type'
-//菜单数据
-let PermissionArr = ref<PermissionList>([])
-// 对话框显示隐藏
-let dialogVisible = ref<boolean>(false)
-//
-let menuData = reactive<MenuParams>({
-    code: '',
-    level: 0,
+} from '@/api/sys/menu';
+
+let PermissionArr = ref<any>([]);
+let dialogVisible = ref<boolean>(false);
+let ids = ref<number[]>([]);
+
+
+let menuData = reactive<any>({
     name: '',
-    pid: 0,
-})
-//挂载加载数据
+    url: '',
+    tag: '',
+    orderNum: 0,
+    remark: '',
+    parentId: 0,
+    type: '',
+});
+
 onMounted(() => {
-    getHasPermission()
-})
+    getHasPermission();
+});
+
 const getHasPermission = async () => {
-    let res: PermissionResponseData = await reqAllPermission()
+    let res: any = await reqAllPermission();
     if (res.code === 200) {
-        PermissionArr.value = res.data
+        PermissionArr.value = res.data;
     }
-}
-//添加按钮
-const addPermission = (row: Permission) => {
-    //清除
+};
+const PermissionArrWithRoot = computed(() => {
+    return [
+        { id: 0, name: '无上级' },
+        ...PermissionArr.value,
+    ];
+});
+
+const addPermission = (row: any) => {
     Object.assign(menuData, {
         id: 0,
-        code: '',
-        level: 0,
         name: '',
-        pid: 0,
-    })
-    dialogVisible.value = true
-    menuData.level = row.level + 1
-    menuData.pid = row.id as number
-}
-//更新按钮
-const updatePermission = (row: Permission) => {
-    dialogVisible.value = true
-    Object.assign(menuData, row)
-}
+        url: '',
+        tag: '',
+        parentId: 0,
+        orderNum: 0,
+        remark: '',
+        type: '',
+    });
+    dialogVisible.value = true;
+};
+
+const updatePermission = (row: any) => {
+    dialogVisible.value = true;
+    menuData.parentId = parseInt(row.parentId);
+    Object.assign(menuData, row);
+};
 
 const save = async () => {
-    dialogVisible.value = false
-    let res: any = await reqAddOrUpdateMenu(menuData)
+    dialogVisible.value = false;
+    let res: any = await reqAddOrUpdateMenu(menuData);
     if (res.code === 200) {
-        dialogVisible.value = false
+        dialogVisible.value = false;
         ElMessage({
             type: 'success',
             message: menuData.id ? '更新成功' : '添加成功',
-        })
-        getHasPermission()
+        });
+        getHasPermission();
     }
-}
-//删除
+};
+
 const removeMenu = async (id: number) => {
-    let res = await reqRemoveMenu(id)
+    ids.value.push(id);
+    const requestData: any = { ids: ids.value };
+    let res = await reqRemoveMenu(requestData);
     if (res.code == 200) {
-        ElMessage({ type: 'success', message: '删除成功' })
+        ids.value = [];
+        ElMessage({ type: 'success', message: '删除成功' });
+        getHasPermission();
     } else {
-        ElMessage({ type: 'error', message: '删除失败' })
+        ElMessage({ type: 'error', message: '删除失败' });
     }
-}
+};
 </script>
+  
 <style lang="scss" scoped></style>

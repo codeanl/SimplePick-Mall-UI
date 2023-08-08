@@ -2,22 +2,22 @@ import request from '@/util/request'
 import type { MenuParams, PermissionResponseData } from './type'
 
 enum API {
-  ALLPERMISSION_URL = '/admin/acl/permission',
-  ADDMENU_URL = '/admin/acl/permission/save',
-  UPDATE_URL = '/admin/acl/permission/update',
-  DELETEMENU_URL = '/admin/acl/permission/remove/',
+  ALLPERMISSION_URL = '/api/sys/menu/list',
+  ADDMENU_URL = '/api/sys/menu/add',
+  UPDATE_URL = '/api/sys/menu/update',
+  DELETEMENU_URL = '/api/sys/menu/delete',
 }
 
 export const reqAllPermission = () =>
-  request.get<any, PermissionResponseData>(API.ALLPERMISSION_URL)
+  request.post<any, any>(API.ALLPERMISSION_URL)
 
-export const reqAddOrUpdateMenu = (data: MenuParams) => {
+export const reqAddOrUpdateMenu = (data: any) => {
   if (data.id) {
-    return request.put<any, any>(API.UPDATE_URL, data)
+    return request.post<any, any>(API.UPDATE_URL, data)
   } else {
     return request.post<any, any>(API.ADDMENU_URL, data)
   }
 }
 
-export const reqRemoveMenu = (id: number) =>
-  request.delete<any, any>(API.DELETEMENU_URL + id)
+export const reqRemoveMenu = (data: any) =>
+  request.post<any, any>(API.DELETEMENU_URL, data)

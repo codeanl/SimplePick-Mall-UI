@@ -70,7 +70,9 @@ let useUserStore = defineStore('User', {
                     router.addRoute(route)
                 })
                 return 'ok'
-            } else {
+            }
+            else {
+                REMOVE_TOKEN()
                 return Promise.reject(new Error(res.message))
             }
         },

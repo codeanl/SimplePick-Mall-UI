@@ -16,6 +16,7 @@ router.beforeEach(async (to, from, next) => {
     let token = userStore.token
     let username = userStore.username
     if (token) {
+        // next()
         if (username) {
             next()
         } else {
