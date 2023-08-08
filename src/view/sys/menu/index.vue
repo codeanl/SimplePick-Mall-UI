@@ -6,7 +6,26 @@
         <!--  -->
         <el-table style="width: 100%; margin-bottom: 20px" row-key="id" border :data="PermissionArr">
             <el-table-column prop="name" label="名称" />
-            <el-table-column prop="type" label="类型" />
+            <!-- <el-table-column prop="type" label="类型" /> -->
+            <el-table-column label="类型" align="center" prop="type" show-overflow-tooltip>
+                <template #="{ row }">
+                    <template v-if="row.type === '1'">
+                        <el-tag key="item.label" class="mx-1" type="success" effect="light">
+                            目录
+                        </el-tag>
+                    </template>
+                    <template v-if="row.type === '2'">
+                        <el-tag key="item.label" class="mx-1" type="danger" effect="light">
+                            菜单
+                        </el-tag>
+                    </template>
+                    <template v-if="row.type === '3'">
+                        <el-tag key="item.label" class="mx-1" type="warning" effect="light">
+                            按钮
+                        </el-tag>
+                    </template>
+                </template>
+            </el-table-column>
             <el-table-column prop="url" label="路径" />
             <el-table-column prop="tag" label="权限值" />
             <el-table-column prop="orderNum" label="排序" />

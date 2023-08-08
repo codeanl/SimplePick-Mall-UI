@@ -46,7 +46,7 @@ export const asyncRoute = [
     {
         path: '/sys',
         component: () => import('@/view/layout/index.vue'),
-        name: 'Acl',
+        name: 'Sys',
         meta: {
             title: '权限管理',
             hidden: false,
@@ -75,9 +75,9 @@ export const asyncRoute = [
                 },
             },
             {
-                path: '/sys/permission',
+                path: '/sys/menu',
                 component: () => import('@/view/sys/menu/index.vue'),
-                name: 'Permission',
+                name: 'Menu',
                 meta: {
                     title: '菜单管理',
                     hidden: false,
@@ -87,7 +87,7 @@ export const asyncRoute = [
             {
                 path: '/sys/place',
                 component: () => import('@/view/sys/place/index.vue'),
-                name: 'Permission',
+                name: 'Place',
                 meta: {
                     title: '自提点管理',
                     hidden: false,

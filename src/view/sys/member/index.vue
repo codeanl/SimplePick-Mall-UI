@@ -289,21 +289,21 @@ const updateUser = (row: User) => {
 
 
 //表单校验 自定义
-const validatorUserName = (value: any, callBack: any) => {
+const validatorUserName = (rule: any, value: any, callBack: any) => {
     if (value.trim().length >= 5) {
         callBack()
     } else {
         callBack(new Error('用户名字至少五位'))
     }
 }
-const validatorName = (value: any, callBack: any) => {
+const validatorName = (rule: any, value: any, callBack: any) => {
     if (value.trim().length >= 5) {
         callBack()
     } else {
         callBack(new Error('用户昵称至少五位'))
     }
 }
-const validatorPassword = (value: any, callBack: any) => {
+const validatorPassword = (rule: any, value: any, callBack: any) => {
     if (value.trim().length >= 5) {
         callBack()
     } else {
