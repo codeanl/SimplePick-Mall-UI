@@ -16,7 +16,6 @@ enum API {
     DELETEUSER_URL = '/api/sys/user/delete',
     DELETEALLUSER_URL = '/admin/acl/user/batchRemove',
     ALLROLEBYUSER_URl = '/api/sys/role/byUserList'
-
 }
 
 export const reqUserInfo = (current: number, pageSize: number, username: string, phone: string, nickname: string, status: string, gender: string) =>

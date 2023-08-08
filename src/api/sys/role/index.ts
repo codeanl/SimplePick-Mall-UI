@@ -1,13 +1,13 @@
 
 import request from '@/util/request'
-import type { RoleResponseData, RoleData, MenuResponseData } from './type'
 
 enum API {
   ALLROLE_URL = '/api/sys/role/list',
   ADDROLE_URL = '/api/sys/role/add',
   UPDATEROLE_URL = '/api/sys/role/update',
-  ALLPERMISSION_URL = '/admin/acl/permission/toAssign/',
-  SETPERMISSION_URL = '/admin/acl/permission/doAssign/?',
+  ALLPERMISSION_URL = '/api/sys/menu/list',
+  MENUBYROLEID_URL = '/api/sys/role/queryMenuByRoleId',
+  UPDATEROLEMMENU_URL = '/api/sys/role/updateRoleMenu',
   REMOVEROLE_URL = '/api/sys/role/delete',
 }
 
@@ -22,13 +22,15 @@ export const reqAddOrUpdateRole = (data: any) => {
   }
 }
 
-export const reqAllMenuList = (roleId: number) =>
-  request.get<any, MenuResponseData>(API.ALLPERMISSION_URL + roleId)
+export const reqAllMenuList = () =>
+  request.post<any, any>(API.ALLPERMISSION_URL)
 
-export const reqSetPermission = (roleId: number, permissionId: number[]) =>
-  request.post(
-    API.SETPERMISSION_URL + `roleId=${roleId}&permissionId=${permissionId}`,
-  )
+export const reqMenuByRoleID = (data: any) =>
+  request.post<any, any>(API.MENUBYROLEID_URL, data)
+
+export const reqUpdateRoleMenu = (data: any) =>
+  request.post<any, any>(API.UPDATEROLEMMENU_URL, data)
+
 
 export const reqRemoveRole = (data: any) =>
   request.post<any, any>(API.REMOVEROLE_URL, data)

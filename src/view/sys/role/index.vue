@@ -94,7 +94,8 @@ import {
     reqAllRoleList,
     reqAddOrUpdateRole,
     reqAllMenuList,
-    reqSetPermission,
+    reqMenuByRoleID,
+    reqUpdateRoleMenu
 } from '@/api/sys/role'
 import type {
     RoleResponseData,
@@ -126,9 +127,9 @@ let form = ref<any>()
 //权限抽屉
 let drawer = ref<boolean>(false)
 //菜单数据收集
-let menuArr = ref<MenuList>([])
+let menuArr = ref<any>([])
 //准备数组 存储勾选的四级  选择的权限
-let selectArr = ref<number[]>([])
+let selectArr = ref<any[]>([])
 //复选框的数据
 let selectIdArr = ref<any[]>([])
 //获取tree组件实例
@@ -188,7 +189,7 @@ const updateRole = (row: RoleData) => {
 }
 
 //表单校验
-const validateRoleName = (rule: any, value: any, callBack: any) => {
+const validateRoleName = (value: any, callBack: any) => {
     if (value.trim().length >= 2) {
         callBack()
     } else {
@@ -215,26 +216,37 @@ const save = async () => {
 }
 //分配权限按钮
 const setPermission = async (row: RoleData) => {
+    menuArr.value = ''
+    selectArr.value = []
     drawer.value = true
     Object.assign(RoleParams, row)
-    let res: MenuResponseData = await reqAllMenuList(RoleParams.id as number)
+    let res: any = await reqAllMenuList()
     if (res.code == 200) {
         menuArr.value = res.data
-        selectArr.value = filterSelectArr(menuArr.value, [])
+    }
+    let res1: any = await reqMenuByRoleID({ id: row.id })
+    if (res1.code === 200) {
+        selectArr.value = filterMenuIds(res.data, res1.data);
     }
 }
-//过滤
-const filterSelectArr = (allData: any, initArr: any) => {
-    allData.forEach((item: any) => {
-        if (item.select && item.level === 4) {
-            initArr.push(item.id)
+
+
+function filterMenuIds(menuArr: any, selectArr: any) {
+    const filteredIds: any = [];
+    const traverseMenu = (menu: any) => {
+        for (const item of menu) {
+            if (selectArr.includes(item.id) && item.children.length === 0) {
+                filteredIds.push(item.id);
+            }
+            if (item.children && item.children.length > 0) {
+                traverseMenu(item.children);
+            }
         }
-        if (item.children && item.children.length > 0) {
-            filterSelectArr(item.children, initArr)
-        }
-    })
-    return initArr
+    };
+    traverseMenu(menuArr);
+    return filteredIds;
 }
+
 
 const defaultProps = {
     children: 'children',
@@ -250,7 +262,7 @@ const handler = async () => {
     let arr1 = tree.value.getHalfCheckedKeys()
     // 合并id
     let permissionId = arr.concat(arr1)
-    let res: any = await reqSetPermission(roleId, permissionId)
+    let res: any = await reqUpdateRoleMenu({ roleId: roleId, menuIds: permissionId })
     if (res.code === 200) {
         drawer.value = false
         ElMessage({

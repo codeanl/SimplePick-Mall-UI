@@ -54,7 +54,7 @@
             <el-table-column label="用户名字" align="center" prop="username" show-overflow-tooltip></el-table-column>
             <el-table-column label="用户昵称" align="center" prop="nickname" show-overflow-tooltip></el-table-column>
             <el-table-column label="性别" align="center" prop="gender" show-overflow-tooltip width="60px">
-                <template #="{ row, $index }">
+                <template #="{ row }">
                     <template v-if="row.gender === '0'">
                         未知
                     </template>
@@ -177,21 +177,16 @@ import {
     reqUserInfo,
     reqAddOrUpdateUser,
     reqAllRole,
-    reqSetUserRole,
     reqRemoveUser,
-    reqSelectUser,
     reqMenuListByUser
 } from '@/api/sys/user'
 import type {
-    UserResponseData,
     Records,
     User,
-    AllRoleResponseData,
-    AllRole,
     SetRoleData,
-
-} from '@/api/acl/user/type'
+} from '@/api/sys/user/type'
 import { ref, onMounted, reactive, nextTick } from 'vue'
+import { ElMessage } from 'element-plus';
 //默认页码
 let pageNo = ref<number>(1)
 //默认个数
@@ -232,12 +227,6 @@ let ids = ref<number[]>([])
 import useLayoutSettingStore from '@/store/setting'
 let settingStore = useLayoutSettingStore()
 
-//展示男女
-let genderMap: {
-    0: '未知',
-    1: '男',
-    2: '女'
-}
 //组件挂载完毕
 onMounted(() => {
     getHasUser()
@@ -300,21 +289,21 @@ const updateUser = (row: User) => {
 
 
 //表单校验 自定义
-const validatorUserName = (rule: any, value: any, callBack: any) => {
+const validatorUserName = (value: any, callBack: any) => {
     if (value.trim().length >= 5) {
         callBack()
     } else {
         callBack(new Error('用户名字至少五位'))
     }
 }
-const validatorName = (rule: any, value: any, callBack: any) => {
+const validatorName = (value: any, callBack: any) => {
     if (value.trim().length >= 5) {
         callBack()
     } else {
         callBack(new Error('用户昵称至少五位'))
     }
 }
-const validatorPassword = (rule: any, value: any, callBack: any) => {
+const validatorPassword = (value: any, callBack: any) => {
     if (value.trim().length >= 5) {
         callBack()
     } else {
@@ -381,7 +370,7 @@ const handleCheckedUsersChange = (value: string[]) => {
 
 //分配角色 确定按钮
 const confirmClick = async () => {
-    let data: SetRoleData = {
+    let data: any = {
         id: userParams.id as number,
         roleId: userRole.value.map((item) => {
             return item.id as number

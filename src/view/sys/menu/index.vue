@@ -107,7 +107,7 @@ const PermissionArrWithRoot = computed(() => {
     ];
 });
 
-const addPermission = (row: any) => {
+const addPermission = () => {
     Object.assign(menuData, {
         id: 0,
         name: '',
