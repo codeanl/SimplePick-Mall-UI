@@ -33,6 +33,7 @@ let useUserStore = defineStore('User', {
             username: '',
             avatar: '',
             buttons: [],
+            routes: []
         }
     },
     // 异步|逻辑的地方
@@ -58,6 +59,7 @@ let useUserStore = defineStore('User', {
                 this.username = res.data.userInfo.username as string
                 this.avatar = res.data.userInfo.avatar as string
                 this.buttons = res.data.buttons
+                this.routes = res.data.routes
                 //计算用户展示的异步路由
                 let userAsyncRoute = filterAsyncRoute(
                     cloneDeep(asyncRoute),

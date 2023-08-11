@@ -99,28 +99,28 @@ export const asyncRoute = [
     {
         path: '/pms',
         component: () => import('@/view/layout/index.vue'),
-        name: 'Product',
+        name: 'Pms',
         meta: {
             title: '商品管理',
             hidden: false,
             icon: 'Goods',
         },
-        redirect: '/pms/brand',
+        redirect: '/pms/category',
         children: [
             {
-                path: '/pms/brand',
-                component: () => import('@/view/pms/brand/index.vue'),
-                name: 'Trademark',
+                path: '/pms/category',
+                component: () => import('@/view/pms/category/index.vue'),
+                name: 'Category',
                 meta: {
-                    title: '品牌管理',
-                    icon: 'ShoppingCart',
+                    title: '分类管理',
+                    icon: 'Management',
                     hidden: false,
                 },
             },
             {
-                path: '/pms/attr',
-                component: () => import('@/view/pms/attr/index.vue'),
-                name: 'Attr',
+                path: '/pms/attribute',
+                component: () => import('@/view/pms/attribute/index.vue'),
+                name: 'Attribute',
                 meta: {
                     title: '属性管理',
                     icon: 'Management',
@@ -130,7 +130,7 @@ export const asyncRoute = [
             {
                 path: '/pms/product',
                 component: () => import('@/view/pms/product/index.vue'),
-                name: 'Spu',
+                name: 'Product',
                 meta: {
                     title: '商品管理',
                     icon: 'SetUp',
