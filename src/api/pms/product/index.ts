@@ -7,7 +7,9 @@ enum API {
     DELETE_URL = '/api/pms/product/delete',
 
     SKULIST_URL = '/api/pms/sku/list',
-    UPDATESKU_URL = '/api/pms/sku/delete',
+    DELETESKU_URL = '/api/pms/sku/delete',
+    UPDATASKU_URL = '/api/pms/sku/update',
+    ADDSKU_URL = '/api/pms/sku/add',
 }
 
 
@@ -30,4 +32,13 @@ export const reqSku = (data: any) =>
     request.post<any, any>(API.SKULIST_URL, data)
 
 export const reqRemoveSKU = (data: number) =>
-    request.post<any, any>(API.UPDATESKU_URL, data)
+    request.post<any, any>(API.DELETESKU_URL, data)
+
+
+export const reqAddOrUpdateSKU = (data: any) => {
+    if (data.id) {
+        return request.post<any, any>(API.UPDATASKU_URL, data)
+    } else {
+        return request.post<any, any>(API.ADDSKU_URL, data)
+    }
+}

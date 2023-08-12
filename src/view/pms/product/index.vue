@@ -38,6 +38,9 @@
                     <el-button type="primary" size="small" icon="Edit" @click="look(row.id)">
                         查看
                     </el-button>
+                    <el-button type="primary" size="small" icon="Edit" @click="addSku(row)">
+                        添加
+                    </el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -142,10 +145,8 @@
     </el-dialog>
     <!-- sku -->
     <el-dialog v-model="drawer1" title="SKU列表" width="70%">
-        <el-button type="success" size="default" @click="addSku">
-            添加用户
-        </el-button>
-        <el-table :data="skuArr"><el-table-column label="SKU图片">
+        <el-table :data="skuArr" v-model="SkuParams">
+            <el-table-column label="SKU图片">
                 <template #="{ row }">
                     <img :src="row.pic" alt="" style="width: 100px; height: 100px" />
                 </template>
@@ -173,26 +174,32 @@
         </el-table>
     </el-dialog>
     <!--  -->
-    <el-dialog v-model="drawer2" title="SKU列表" width="70%">
+    <el-dialog v-model="drawer2" title="SKU" width="70%">
         <el-form :model="SkuParams" ref="formRef">
             <el-form-item label="名称" prop="name">
                 <el-input placeholder="请您输入名称" v-model="SkuParams.name"></el-input>
             </el-form-item>
-            <el-form-item label="sku编号" prop="SkuSn">
-                <el-input placeholder="请您输入副标题" v-model="SkuParams.SkuSn"></el-input>
+            <el-form-item label="sku编号" prop="skuSn">
+                <el-input placeholder="请您输入" v-model="SkuParams.skuSn"></el-input>
             </el-form-item>
             <el-form-item label="商品描述" prop="description">
                 <el-input placeholder="商品描述" v-model="SkuParams.description"></el-input>
             </el-form-item>
-            <el-form-item label="副标题" prop="subTitle">
-                <el-input placeholder="副标题" v-model="SkuParams.subTitle"></el-input>
-            </el-form-item>
             <el-form-item label="库存" prop="stock">
-                <el-input placeholder="库存" v-model="SkuParams.stock"></el-input>
+                <el-input placeholder="库存" v-model.number="SkuParams.stock"></el-input>
             </el-form-item>
-            <el-form-item label="价格" prop="stock">
+            <el-form-item label="价格" prop="price">
                 <el-input placeholder="价格" v-model="SkuParams.price"></el-input>
             </el-form-item>
+            <el-form-item v-for="(attr, index) in SkuParams.sizeList" :label="attr.name" :prop="`sizeList${index}`">
+                <el-select v-model="SkuParams.AttributeShopValueID[index]" placeholder="请选择属性">
+                    <el-option v-for="(option, optionIndex) in attr.sizeValueList" :key="optionIndex" :label="option.name"
+                        :value="option.id" />
+                </el-select>
+            </el-form-item>
+            <!-- <el-form-item label="AttributeShopValueID" prop="AttributeShopValueID">
+                <el-input placeholder="AttributeShopValueID" v-model="SkuParams.AttributeShopValueID"></el-input>
+            </el-form-item> -->
             <el-form-item label="商品封面" prop="pic">
                 <el-upload class="avatar-uploader" action="/api/api/sys/upload" :show-file-list="false"
                     :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
@@ -202,6 +209,7 @@
                     </el-icon>
                 </el-upload>
             </el-form-item>
+
         </el-form>
         <template #footer>
             <div style="flex: auto">
@@ -215,7 +223,7 @@
 <script setup lang="ts">
 // let currentStep = ref<number>(1)
 import { ref, onMounted, reactive, nextTick } from 'vue'
-import { reqAllProduct, reqAddOrUpdate, reqRemove, reqSku, reqRemoveSKU } from '@/api/pms/product'
+import { reqAllProduct, reqAddOrUpdate, reqRemove, reqSku, reqRemoveSKU, reqAddOrUpdateSKU } from '@/api/pms/product'
 import { reqAll } from '@/api/pms/category'
 import { reqAllAttribute } from '@/api/pms/attribute'
 //默认页码
@@ -228,6 +236,7 @@ let listArr = ref<any>([])
 let skuArr = ref<any>([])
 let AttrArr = ref<any>([])
 let AttrValueIDs = ref<any>([])
+let Size = ref<any>([])
 //收集删除的id
 let ids = ref<number[]>([])
 //多选框选择的id
@@ -266,13 +275,13 @@ let SkuParams = reactive<any>({
     productId: 0,
     name: '',
     pic: '',
-    SkuSn: '',
+    skuSn: '',
     subTitle: '',
     description: '',
-    stock: '',
+    stock: 0,
     price: '',
-    AttributeValueID: '',
-    AttributeShopValueID: ''
+    AttributeShopValueID: [],
+    sizeList: []
 })
 //组件挂载完毕
 onMounted(() => {
@@ -380,7 +389,9 @@ import { size } from 'lodash';
 const handleAvatarSuccess: UploadProps['onSuccess'] = (response) => {
     //上传返回的数据 图片url  uploadFile
     Params.pic = response.data;
+    SkuParams.pic = response.data;
     formRef.value.clearValidate('pic')
+    SkuParams.value.clearValidate('pic')
 }
 //上传图片之前出发的钩子函数
 const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
@@ -425,13 +436,29 @@ const deleteSku = async (id: number) => {
     }
 }
 // 添加sku按钮
-const addSku = () => {
+const addSku = (row: any) => {
+    Object.assign(SkuParams, {
+        id: 0,
+        productId: row.id,
+        name: '',
+        pic: '',
+        skuSn: '',
+        subTitle: '',
+        description: '',
+        stock: 0,
+        price: '',
+        AttributeShopValueID: [],
+        sizeList: row.sizeList
+    })
     drawer2.value = true
+
 }
+
 // 更新sku按钮
-const updatesku = () => {
+const updatesku = (row: any) => {
     drawer2.value = true
     drawer1.value = false
+    Object.assign(SkuParams, row)
 }
 //sku取消按钮
 const cancelsku = () => {
@@ -439,9 +466,26 @@ const cancelsku = () => {
     drawer1.value = true
 }
 //sku确定按钮
-const savesku = () => {
-    drawer2.value = false
-    drawer1.value = true
+const savesku = async () => {
+    SkuParams.stock = parseInt(SkuParams.stock);
+    SkuParams.price = parseFloat(SkuParams.price);
+    let res: any = await reqAddOrUpdateSKU(SkuParams)
+    if (res.code == 200) {
+        drawer2.value = false
+        look(SkuParams.productId)
+        ElMessage({
+            type: 'success',
+            message: SkuParams.id ? '更新成功' : '添加成功',
+        })
+        // window.location.reload()
+        getHas()
+    } else {
+        ElMessage({
+            type: 'error',
+            message: SkuParams.id ? '更新失败' : '添加失败',
+        })
+    }
+
 }
 
 // let handleNodeClick = async (event: any, id: number) => {
@@ -477,6 +521,7 @@ let addTagValue = (row: any) => {
         newTagValue.value = ''; // 清空输入框
     }
 }
+
 </script>
 
 <style lang="scss" scoped></style>

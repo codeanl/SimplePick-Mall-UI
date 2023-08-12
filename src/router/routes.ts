@@ -172,6 +172,63 @@ export const asyncRoute = [
             },
         ],
     },
+    {
+        path: '/ums',
+        component: () => import('@/view/layout/index.vue'),
+        name: 'Ums',
+        meta: {
+            title: '会员管理',
+            hidden: false,
+            icon: 'Goods',
+        },
+        redirect: '/ums/member',
+        children: [
+            {
+                path: '/ums/member',
+                component: () => import('@/view/ums/member/index.vue'),
+                name: 'Member',
+                meta: {
+                    title: '会员管理',
+                    icon: 'ShoppingCart',
+                    hidden: false,
+                },
+            },
+
+        ],
+    },
+    {
+        path: '/sms',
+        component: () => import('@/view/layout/index.vue'),
+        name: 'Sms',
+        meta: {
+            title: '营销管理',
+            hidden: false,
+            icon: 'Goods',
+        },
+        redirect: '/sms/coupon',
+        children: [
+            {
+                path: '/sms/homeAdvertise',
+                component: () => import('@/view/sms/homeAdvertise/index.vue'),
+                name: 'HomeAdvertise',
+                meta: {
+                    title: '广告管理',
+                    icon: 'ShoppingCart',
+                    hidden: false,
+                },
+            },
+            {
+                path: '/sms/coupon',
+                component: () => import('@/view/sms/coupon/index.vue'),
+                name: 'Coupon',
+                meta: {
+                    title: '优惠券管理',
+                    icon: 'ShoppingCart',
+                    hidden: false,
+                },
+            },
+        ],
+    },
 ]
 
 export const anyRoute = {
