@@ -1,5 +1,4 @@
-import Category from './Category/index.vue'
-const allGlocalComponent: any = { Category }
+const allGlocalComponent: any = {}
 //对外暴露插件对象
 export default {
     install(app) {

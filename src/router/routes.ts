@@ -227,6 +227,59 @@ export const asyncRoute = [
                     hidden: false,
                 },
             },
+            {
+                path: '/sms/subject',
+                component: () => import('@/view/sms/subject/index.vue'),
+                name: 'Subject',
+                meta: {
+                    title: '专题管理',
+                    icon: 'ShoppingCart',
+                    hidden: false,
+                },
+            },
+            {
+                path: '/sms/subjectProduct',
+                component: () => import('@/view/sms/subjectProduct/index.vue'),
+                name: 'SubjectProduct',
+                meta: {
+                    title: '专题商品管理',
+                    icon: 'ShoppingCart',
+                    hidden: false,
+                },
+            },
+        ],
+    },
+    {
+        path: '/oms',
+        component: () => import('@/view/layout/index.vue'),
+        name: 'Oms',
+        meta: {
+            title: '订单管理',
+            hidden: false,
+            icon: 'Goods',
+        },
+        redirect: '/oms/order',
+        children: [
+            {
+                path: '/oms/order',
+                component: () => import('@/view/oms/order/index.vue'),
+                name: 'Order',
+                meta: {
+                    title: '订单管理',
+                    icon: 'ShoppingCart',
+                    hidden: false,
+                },
+            },
+            {
+                path: '/oms/returnapply',
+                component: () => import('@/view/oms/returnapply/index.vue'),
+                name: 'ReturnApply',
+                meta: {
+                    title: '优惠券管理',
+                    icon: 'ShoppingCart',
+                    hidden: false,
+                },
+            },
         ],
     },
 ]

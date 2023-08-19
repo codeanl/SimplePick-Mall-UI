@@ -5,6 +5,7 @@ enum API {
     ADD_URL = '/api/pms/product/add',
     UPDATE_URL = '/api/pms/product/update',
     DELETE_URL = '/api/pms/product/delete',
+    INFO_URL = '/api/pms/product/info',
 
     SKULIST_URL = '/api/pms/sku/list',
     DELETESKU_URL = '/api/pms/sku/delete',
@@ -24,6 +25,9 @@ export const reqAddOrUpdate = (data: any) => {
         return request.post<any, any>(API.ADD_URL, data)
     }
 }
+
+export const reqProductInfo = (data: any) =>
+    request.post<any, any>(API.INFO_URL, data)
 
 export const reqRemove = (data: number) =>
     request.post<any, any>(API.DELETE_URL, data)

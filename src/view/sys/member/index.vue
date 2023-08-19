@@ -17,16 +17,15 @@
                     <el-option label="男" value="1" />
                     <el-option label="女" value="2" />
                 </el-select>
-                <!-- <el-input placeholder="请输入搜索的性别" v-model="gender"></el-input> -->
             </el-form-item>
             <el-form-item label="状态:">
                 <el-select v-model="status" class="m-2" placeholder="请选择状态">
                     <el-option label="正常" value="1" />
                     <el-option label="禁用" value="0" />
                 </el-select>
-                <!-- <el-input placeholder="请输入搜索的状态" v-model="status"></el-input> -->
             </el-form-item>
             <el-form-item>
+                <!-- 搜索内容为空的时候搜索按钮禁用 -->
                 <el-button type="primary" size="default" @click="search"
                     :disabled="username.length || nickname.length || phone.length || gender.length || status.length ? false : true">
                     搜索
@@ -44,6 +43,7 @@
             批量删除
         </el-button>
         <el-table border :data="userArr" @selection-change="selectChange">
+            <!--复选框 -->
             <el-table-column type="selection" align="center" width="30px"></el-table-column>
             <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
             <el-table-column label="头像" align="center" prop="avatar" show-overflow-tooltip width="60px">
@@ -79,6 +79,7 @@
                         inactive-value="0" @change="handleChange(row)" />
                 </template>
             </el-table-column>
+            <!-- 右边进行操作 -->
             <el-table-column label="操作" width="300px" align="center">
                 <template #="{ row }">
                     <el-button type="warning" size="small" icon="User" @click="setRole(row)">
@@ -123,14 +124,12 @@
                     <el-option label="男" value="1" />
                     <el-option label="女" value="2" />
                 </el-select>
-                <!-- <el-input placeholder="请您输入性别" v-model="userParams.gender"></el-input> -->
             </el-form-item>
             <el-form-item label="状态" prop="status">
                 <el-select v-model="userParams.status" class="m-2" placeholder="请选择状态">
                     <el-option label="正常" value="1" />
                     <el-option label="禁用" value="0" />
                 </el-select>
-                <!-- <el-input placeholder="请您输入状态" v-model="userParams.status"></el-input> -->
             </el-form-item>
         </el-form>
         <template #footer>
@@ -183,7 +182,6 @@ import {
 import type {
     Records,
     User,
-    SetRoleData,
 } from '@/api/sys/user/type'
 import { ref, onMounted, reactive, nextTick } from 'vue'
 import { ElMessage } from 'element-plus';

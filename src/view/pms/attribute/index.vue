@@ -5,12 +5,6 @@
             <el-form-item label="用户名:">
                 <el-input placeholder="请输入搜索的用户名" v-model="name"></el-input>
             </el-form-item>
-            <el-form-item label="类型:">
-                <el-select v-model="type" class="m-2" placeholder="请选择类型">
-                    <el-option label="平台属性" value="1" />
-                    <el-option label="销售属性" value="2" />
-                </el-select>
-            </el-form-item>
             <el-form-item label="用户名:">
                 <el-tree-select v-model="CateID" :data="CateListArr" check-strictly
                     :props="{ key: 'categoryId', label: 'name' }" node-key="id" :render-after-expand="false" />
@@ -31,29 +25,15 @@
         <el-table border style="margin:10px 0" :data="ListArr">
             <el-table-column label="编号" width="70px" align="center" prop="id"></el-table-column>
             <el-table-column label="属性名称" align="center" prop="name"></el-table-column>
-            <el-table-column label="类型" align="center" prop="type" show-overflow-tooltip>
-                <template #="{ row }">
-                    <template v-if="row.type === '1'">
-                        <el-tag class="mx-1" type="success" effect="light">
-                            平台属性
-                        </el-tag>
-                    </template>
-                    <template v-if="row.type === '2'">
-                        <el-tag class="mx-1" type="warning" effect="light">
-                            销售属性
-                        </el-tag>
-                    </template>
-                </template>
-            </el-table-column>
             <el-table-column label="属性值" align="center">
-                <template #="{ row, $index }">
-                    <el-tag type="success" style="margin: 5px" v-for="(item, index) in row.attributeValue" :key="item.id">
+                <template #="{ row }">
+                    <el-tag type="success" style="margin: 5px" v-for="(item) in row.attributeValue" :key="item.id">
                         {{ item.name }}
                     </el-tag>
                 </template>
             </el-table-column>
             <el-table-column label="操作" align="center">
-                <template #="{ row, $index }">
+                <template #="{ row }">
                     <el-button type="primary" size="small" @click="update(row)" icon="Edit">编辑</el-button>
                     <el-popconfirm :title="`你确定删除${row.name}?`" width="200px" @confirm="deleteAttr(row.id)">
                         <template #reference>
@@ -70,12 +50,6 @@
             <el-form-item label="所属分类">
                 <el-tree-select v-model="Params.categoryId" :data="CateListArr" check-strictly
                     :props="{ key: 'categoryId', label: 'name' }" node-key="id" :render-after-expand="false" />
-            </el-form-item>
-            <el-form-item label="类型" prop="type">
-                <el-select v-model="Params.type" class="m-2" placeholder="请选择">
-                    <el-option label="平台属性" value="1" />
-                    <el-option label="销售属性" value="2" />
-                </el-select>
             </el-form-item>
             <el-form-item label="属性名称">
                 <el-input placeholder="请输入属性名称" v-model="Params.name"></el-input>
@@ -110,23 +84,22 @@
 </template>
 
 <script setup lang="ts">
-import { watch, ref, reactive, nextTick, onBeforeUnmount, onMounted } from 'vue'
+import { ref, reactive, nextTick, onMounted } from 'vue'
 //获取属性
 import { reqAllAttribute, reqAddOrUpdate, reqRemove } from '@/api/pms/attribute'
 import { reqAll } from '@/api/pms/category'
 //c存储已有的属性和属性值
-let ListArr = ref<Attr[]>([])
+let ListArr = ref<any[]>([])
 //默认页码
 let pageNo = ref<number>(1)
 //默认个数
 let pageSize = ref<number>(10)
 let total = ref<number>(0)
-//数据列表
-let userArr = ref<Records>([])
+
 //数据
 let name = ref<string>('')
 let type = ref<string>('')
-let CateID = ref<number>('')
+let CateID = ref<number>(0)
 // 
 let drawer = ref<boolean>(false)
 //分类
@@ -141,7 +114,7 @@ let Params = reactive<any>({
     attributeValue: [],
     categoryId: 0,
     type: '',
-    UpdateValue: []
+    attributeName: []
 })
 
 //组件挂载完毕
@@ -177,20 +150,13 @@ let add = () => {
         attributeValue: [],
         categoryId: 0,
         type: '',
-        UpdateValue: []
+        attributeName: []
     })
     drawer.value = true
 }
 //修改
 let update = (row: any) => {
     drawer.value = true
-    //将已有的属性对象给
-    // 选择性上传的字段
-    // const selectedFields = {
-    //     id: row.id,
-    //     value: row.name,
-    // };
-    // Object.assign(Params, selectedFields)
     //将已有的属性对象给
     Object.assign(Params, JSON.parse(JSON.stringify(row)))
 }
@@ -249,6 +215,10 @@ const toEdit = (row: any, $index: number) => {
 }
 //保存按钮
 const save = async () => {
+    Params.attributeName = []
+    for (let i = 0; i < Params.attributeValue.length; i++) {
+        Params.attributeName.push(Params.attributeValue[i].name);
+    }
     let res: any = await reqAddOrUpdate(Params)
     if (res.code === 200) {
         drawer.value = false

@@ -16,13 +16,10 @@
             </el-table-column>
             <el-table-column label="商品名称" align="center" prop="name" show-overflow-tooltip></el-table-column>
             <el-table-column label="货号" align="center" prop="productSn" show-overflow-tooltip></el-table-column>
-            <el-table-column label="副标题" align="center" prop="subTitle" show-overflow-tooltip></el-table-column>
-            <el-table-column label="商品描述" align="center" prop="description" show-overflow-tooltip></el-table-column>
+            <el-table-column label="商品描述" align="center" prop="desc" show-overflow-tooltip></el-table-column>
             <el-table-column label="价格" align="center" prop="price" show-overflow-tooltip></el-table-column>
             <el-table-column label="市场价" align="center" prop="originalPrice" show-overflow-tooltip></el-table-column>
-            <el-table-column label="库存" align="center" prop="stock" show-overflow-tooltip></el-table-column>
             <el-table-column label="单位" align="center" prop="unit" show-overflow-tooltip></el-table-column>
-            <el-table-column label="销量" align="center" prop="sale" show-overflow-tooltip></el-table-column>
             <el-table-column label="操作" width="300px" align="center">
                 <template #="{ row }">
                     <el-button type="primary" size="small" icon="Edit" @click="update(row)">
@@ -51,19 +48,6 @@
     </el-card>
     <!-- 抽屉  完成 添加｜修改 的窗口 -->
     <el-dialog v-model="drawer" :title="Params.id ? '更新' : '添加'">
-        <!-- <el-steps :active="currentStep" align-center>
-            <el-step title="添加用户信息" description="Some description"></el-step>
-            <el-step title="添加角色信息" description="Some description"></el-step>
-        </el-steps>
-        <div v-if="currentStep === 0">
-            <el-form>
-                1111
-            </el-form>
-        </div>
-        <div v-else-if="currentStep === 1">
-            <el-form>
-            </el-form>
-        </div> -->
         <el-form :model="Params" ref="formRef" :inline="true">
             <el-form-item label="名称" prop="name">
                 <el-input placeholder="请您输入名称" v-model="Params.name"></el-input>
@@ -76,14 +60,14 @@
             <el-form-item label="货号" prop="productSn">
                 <el-input placeholder="请您输入货号" v-model="Params.productSn"></el-input>
             </el-form-item>
-            <el-form-item label="副标题" prop="subTitle">
-                <el-input placeholder="请您输入副标题" v-model="Params.subTitle"></el-input>
-            </el-form-item>
-            <el-form-item label="商品描述" prop="description">
-                <el-input placeholder="商品描述" v-model="Params.description"></el-input>
+            <el-form-item label="商品描述" prop="desc">
+                <el-input placeholder="商品描述" v-model="Params.desc"></el-input>
             </el-form-item>
             <el-form-item label="市场价" prop="originalPrice">
                 <el-input placeholder="市场价" v-model="Params.originalPrice"></el-input>
+            </el-form-item>
+            <el-form-item label="价格" prop="price">
+                <el-input placeholder="价格" v-model="Params.price"></el-input>
             </el-form-item>
             <el-form-item label="单位" prop="unit">
                 <el-input placeholder="单位" v-model="Params.unit"></el-input>
@@ -97,6 +81,7 @@
                     </el-icon>
                 </el-upload>
             </el-form-item>
+            <!--  -->
             <!-- <el-form-item label="属性列表" prop="attrList">
                 <el-select v-model="Params.attrList" placeholder="请选择属性">
                     <el-option v-for="attr in AttrArr" :key="attr.id" :label="attr.name" :value="attr.value" />
@@ -104,25 +89,30 @@
             </el-form-item> -->
         </el-form>
         <el-form :model="Params" :inline="true">
-            <el-form-item v-for="(attr, index) in AttrArr" :label="attr.name" :prop="`attrList${index}`">
-                <el-select v-model="Params.attributeValueID[index]" placeholder="请选择属性">
-                    <el-option v-for="option in attr.attributeValue" :key="option.id" :label="option.name"
-                        :value="option.id" />
-                </el-select>
-            </el-form-item>
+            <!--  -->
+            <el-upload v-model:file-list="fileList" action="/api/api/sys/upload" list-type="picture-card"
+                :on-preview="handlePictureCardPreview" :on-remove="handleRemove" :on-success="handleAvatarSuccess1">
+                <el-icon>
+                    <Plus />
+                </el-icon>
+            </el-upload>
+            <el-dialog v-model="dialogVisible">
+                <img w-full :src="dialogImageUrl" alt="Preview Image" />
+            </el-dialog>
+            <!--  -->
         </el-form>
-        <el-form :model="Params" :inline="true">
+        <el-form :model="Params.size" :inline="true">
             <el-input v-model="newAttributeName" placeholder="请输入属性名字"></el-input>
             <el-button style="margin-left: 10px" type="primary" size="default" icon="Plus" @click="addAttribute">
                 添加属性
             </el-button>
-            <el-table border style="margin: 10px 0" :data="Params.sizeList">
+            <el-table border style="margin: 10px 0" :data="Params.size">
                 <el-table-column label="销售属性名字" width="120px" prop="name"></el-table-column>
                 <el-table-column label="销售属性值">
                     <template #="{ row, $index }">
-                        <el-tag v-for="(item) in row.sizeValueList" :key="row.id" class="mx-1" closable
-                            style="margin: 0 8px" @close="row.sizeValueList.splice($index, 1)">
-                            {{ item.name }}
+                        <el-tag v-for="(item) in row.sizeValue" :key="row.id" class="mx-1" closable style="margin: 0 8px"
+                            @close="row.sizeValue.splice($index, 1)">
+                            {{ item }}
                         </el-tag>
                         <el-input v-model="newTagValue" placeholder="请输入属性值" size="small" style="width: 50px"></el-input>
                         <el-button size=" small" icon="Plus" @click="addTagValue(row)"></el-button>
@@ -131,7 +121,7 @@
                 <el-table-column label="操作" width="120px">
                     <template #="{ row, $index }">
                         <el-button type="danger" size="small" icon="Delete"
-                            @click="Params.sizeList.splice($index, 1)"></el-button>
+                            @click="Params.size.splice($index, 1)"></el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -197,9 +187,7 @@
                         :value="option.id" />
                 </el-select>
             </el-form-item>
-            <!-- <el-form-item label="AttributeShopValueID" prop="AttributeShopValueID">
-                <el-input placeholder="AttributeShopValueID" v-model="SkuParams.AttributeShopValueID"></el-input>
-            </el-form-item> -->
+
             <el-form-item label="商品封面" prop="pic">
                 <el-upload class="avatar-uploader" action="/api/api/sys/upload" :show-file-list="false"
                     :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
@@ -221,11 +209,33 @@
 </template>
 
 <script setup lang="ts">
-// let currentStep = ref<number>(1)
-import { ref, onMounted, reactive, nextTick } from 'vue'
-import { reqAllProduct, reqAddOrUpdate, reqRemove, reqSku, reqRemoveSKU, reqAddOrUpdateSKU } from '@/api/pms/product'
+import { ref } from 'vue'
+import { Plus } from '@element-plus/icons-vue'
+
+import type { UploadProps, UploadUserFile } from 'element-plus'
+
+const fileList = ref<UploadUserFile[]>([])
+
+const dialogImageUrl = ref('')
+const dialogVisible = ref(false)
+
+const handleRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
+    console.log(uploadFile, uploadFiles)
+    Params.imgUrl = Params.imgUrl.filter((item) => item !== uploadFile.url);
+}
+
+
+const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
+    dialogImageUrl.value = uploadFile.url!
+    dialogVisible.value = true
+}
+
+// -----------------------------------------------
+import { ref, onMounted, reactive } from 'vue'
+import { reqAllProduct, reqAddOrUpdate, reqRemove, reqSku, reqRemoveSKU, reqAddOrUpdateSKU, reqProductInfo } from '@/api/pms/product'
 import { reqAll } from '@/api/pms/category'
 import { reqAllAttribute } from '@/api/pms/attribute'
+
 //默认页码
 let pageNo = ref<number>(1)
 //默认个数
@@ -236,7 +246,6 @@ let listArr = ref<any>([])
 let skuArr = ref<any>([])
 let AttrArr = ref<any>([])
 let AttrValueIDs = ref<any>([])
-let Size = ref<any>([])
 //收集删除的id
 let ids = ref<number[]>([])
 //多选框选择的id
@@ -257,20 +266,23 @@ let formRef = ref<any>()
 let drawer = ref<boolean>(false)
 let drawer1 = ref<boolean>(false)
 let drawer2 = ref<boolean>(false)
-let Params = reactive<any>({
+const Params = reactive<any>({
+    id: 0,
     categoryId: 0,
     name: '',
     pic: '',
-    description: '',
+    desc: '',
     price: '',
     originalPrice: 0,
     unit: '',
     productSn: '',
     subTitle: '',
-    attributeValueID: [],
-    size: [],
-    sizeList: []
+    attributeValue: [],
+    size: [{ name: '', sizeValue: [] }],
+    sizeList: [],
+    imgUrl: []
 })
+
 let SkuParams = reactive<any>({
     productId: 0,
     name: '',
@@ -309,30 +321,66 @@ const cancel = () => {
     drawer.value = false
 }
 // 编辑按钮
-const update = (row: any) => {
-    drawer.value = true
-    Params.attributeValueID = []
-    fetchAttributeList(row.categoryId)
-    AttrValueIDs.value = row.attrValueIds
-    Object.assign(Params, row)
-}
-//添加用户按钮
-const add = () => {
-    drawer.value = true
-    //存储收集已有的账号信息
+const update = async (row: any) => {
+    fileList.value = []
     Object.assign(Params, {
         id: 0,
         categoryId: 0,
         name: '',
         pic: '',
-        description: '',
+        desc: '',
         price: '',
         originalPrice: 0,
         unit: '',
         productSn: '',
-        subTitle: '',
-        sizeList: []
+        attributeValueID: [],
+        size: [],
+        imgUrl: [],
     })
+    drawer.value = true
+    fetchAttributeList(row.categoryId)
+    AttrValueIDs.value = row.attrValueIds
+    let res = await reqProductInfo({ id: row.id })
+    if (res.code == 200) {
+        // 初始化 Params.size
+        Params.size = []
+        Object.assign(Params, {
+            id: res.data.productInfo.id,
+            categoryId: res.data.productInfo.categoryId,
+            name: res.data.productInfo.name,
+            pic: res.data.productInfo.pic,
+            desc: res.data.productInfo.desc,
+            price: res.data.productInfo.price,
+            originalPrice: res.data.productInfo.originalPrice,
+            unit: res.data.productInfo.unit,
+            productSn: res.data.productInfo.productSn,
+            attributeValue: res.data.attributeValue,
+            sizeList: res.data.sizeList,
+            imgUrl: res.data.imgUrl,
+        })
+        res.data.sizeList.forEach(item => {
+            const sizeItem = {
+                name: item.name,
+                sizeValue: item.sizeValue.map(value => value.name)
+            };
+            Params.size.push(sizeItem);
+        });
+        fileList.value = Params.imgUrl.map((url) => ({
+            name: url.substring(url.lastIndexOf('/') + 1),
+            url: url
+        }));
+    }
+
+}
+//添加用户按钮
+const add = () => {
+    drawer.value = true
+    //存储收集已有的账号信息
+    // 清空Params对象
+    fileList.value = []
+    Object.keys(Params).forEach(key => {
+        Params[key] = Array.isArray(Params[key]) ? [] : '';
+    });
 }
 
 //窗口保存按钮
@@ -340,9 +388,7 @@ const save = async () => {
     // 将 originalPrice 字段转换为 float64 类型
     Params.originalPrice = parseFloat(Params.originalPrice);
     Params.price = parseFloat(Params.price);
-    Params.size = Params.sizeList.map(item => {
-        return { name: item.name, sizeValue: item.sizeValueList };
-    });
+
     let res: any = await reqAddOrUpdate(Params)
     if (res.code == 200) {
         drawer.value = false
@@ -392,6 +438,11 @@ const handleAvatarSuccess: UploadProps['onSuccess'] = (response) => {
     SkuParams.pic = response.data;
     formRef.value.clearValidate('pic')
     SkuParams.value.clearValidate('pic')
+}
+const handleAvatarSuccess1: UploadProps['onSuccess'] = (response) => {
+    //上传返回的数据 图片url  uploadFile
+    Params.imgUrl.push(response.data)
+    Params.imgUrl.value.clearValidate('imgUrl')
 }
 //上传图片之前出发的钩子函数
 const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
@@ -443,9 +494,9 @@ const addSku = (row: any) => {
         name: '',
         pic: '',
         skuSn: '',
-        subTitle: '',
-        description: '',
+        desc: '',
         stock: 0,
+        description: '',
         price: '',
         AttributeShopValueID: [],
         sizeList: row.sizeList
@@ -469,6 +520,7 @@ const cancelsku = () => {
 const savesku = async () => {
     SkuParams.stock = parseInt(SkuParams.stock);
     SkuParams.price = parseFloat(SkuParams.price);
+
     let res: any = await reqAddOrUpdateSKU(SkuParams)
     if (res.code == 200) {
         drawer2.value = false
@@ -485,15 +537,8 @@ const savesku = async () => {
             message: SkuParams.id ? '更新失败' : '添加失败',
         })
     }
-
 }
 
-// let handleNodeClick = async (event: any, id: number) => {
-//     let res = await reqAllAttribute(1, 100, '', '', id)
-//     if (res.code == 200) {
-//         AttrArr.value = res.data
-//     }
-// }
 let fetchAttributeList = async (categoryId: number) => {
     let res = await reqAllAttribute(1, 100, '', '', categoryId)
     if (res.code == 200) {
@@ -504,24 +549,23 @@ let fetchAttributeList = async (categoryId: number) => {
 let newTagValue = ref<any>([])
 let newAttributeName = ref<any>([])
 let addAttribute = () => {
+    console.log(newAttributeName.value);
+
     if (newAttributeName.value) {
-        Params.sizeList.push({
+        Params.size.push({
             name: newAttributeName.value,
-            sizeValueList: []
+            sizeValue: []
         });
         newAttributeName.value = ''; // 清空输入框
     }
 }
 
-let addTagValue = (row: any) => {
-    if (newTagValue.value) {
-        row.sizeValueList.push({
-            name: newTagValue.value
-        });
+const addTagValue = (row: any) => {
+    if (newTagValue.value.trim() !== '') {
+        row.sizeValue.push(newTagValue.value);
         newTagValue.value = ''; // 清空输入框
     }
-}
-
+};
 </script>
 
 <style lang="scss" scoped></style>
