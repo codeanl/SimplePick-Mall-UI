@@ -40,6 +40,7 @@ export const constantRoute = [
             hidden: true,
         },
     },
+
 ]
 
 export const asyncRoute = [
@@ -271,11 +272,54 @@ export const asyncRoute = [
                 },
             },
             {
-                path: '/oms/returnapply',
-                component: () => import('@/view/oms/returnapply/index.vue'),
+                path: '/oms/returnApply',
+                component: () => import('@/view/oms/returnApply/index.vue'),
                 name: 'ReturnApply',
                 meta: {
-                    title: '优惠券管理',
+                    title: '退货管理',
+                    icon: 'ShoppingCart',
+                    hidden: false,
+                },
+            },
+            {
+                path: '/oms/returnReason',
+                component: () => import('@/view/oms/returnReason/index.vue'),
+                name: 'ReturnReason',
+                meta: {
+                    title: '退货原因管理',
+                    icon: 'ShoppingCart',
+                    hidden: false,
+                },
+            },
+        ],
+    },
+    {
+        path: '/setting',
+        component: () => import('@/view/layout/index.vue'),
+        name: 'Setting',
+        meta: {
+            title: '系统',
+            hidden: false,
+            icon: 'Goods',
+        },
+        redirect: '/setting/profile',
+        children: [
+            {
+                path: '/setting/profile',
+                component: () => import('@/view/setting/profile/index.vue'),
+                name: 'Profile',
+                meta: {
+                    title: '个人设置',
+                    icon: 'ShoppingCart',
+                    hidden: false,
+                },
+            },
+            {
+                path: '/setting/setting',
+                component: () => import('@/view/setting/setting/index.vue'),
+                name: 'SystemSetting',
+                meta: {
+                    title: '系统设置',
                     icon: 'ShoppingCart',
                     hidden: false,
                 },

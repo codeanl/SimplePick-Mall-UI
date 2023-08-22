@@ -46,6 +46,9 @@
         </span>
         <template #dropdown>
           <el-dropdown-menu>
+            <el-dropdown-item @click="profile">个人信息</el-dropdown-item>
+          </el-dropdown-menu>
+          <el-dropdown-menu>
             <el-dropdown-item @click="logout">退出登录</el-dropdown-item>
           </el-dropdown-menu>
         </template>
@@ -56,6 +59,7 @@
 
 <script setup lang="ts">
 import useLayoutSettingStore from '@/store/setting'
+import { REMOVE_TOKEN } from '@/util/token'
 let layoutSettingStore = useLayoutSettingStore()
 import { useRoute } from 'vue-router'
 let $route = useRoute()
@@ -91,6 +95,9 @@ const logout = async () => {
   $router.push({ path: '/login' })
 }
 
+const profile = async () => {
+  $router.push({ path: '/setting/profile' })
+}
 import { ref } from 'vue'
 const color = ref('rgba(255, 69, 0, 0.68)')
 const predefineColors = ref([

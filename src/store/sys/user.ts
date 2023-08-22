@@ -79,15 +79,19 @@ let useUserStore = defineStore('User', {
             }
         },
         async userLogout() {
-            let res = await reqLogout()
-            if (res.code === 200) {
-                this.token = ''
-                this.username = ''
-                this.avatar = ''
-                REMOVE_TOKEN()
-            } else {
-                return Promise.reject(new Error(res.message))
-            }
+            // let res = await reqLogout()
+            // if (res.code === 200) {
+            //     this.token = ''
+            //     this.username = ''
+            //     this.avatar = ''
+            //     REMOVE_TOKEN()
+            // } else {
+            //     return Promise.reject(new Error(res.message))
+            // }
+            this.token = ''
+            this.username = ''
+            this.avatar = ''
+            REMOVE_TOKEN()
         },
     },
     getters: {},

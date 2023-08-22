@@ -15,7 +15,8 @@ enum API {
     SETROLE_url = '/admin/acl/user/doAssignRole',
     DELETEUSER_URL = '/api/sys/user/delete',
     DELETEALLUSER_URL = '/admin/acl/user/batchRemove',
-    ALLROLEBYUSER_URl = '/api/sys/role/byUserList'
+    ALLROLEBYUSER_URl = '/api/sys/role/byUserList',
+    UPDATEPWD_URl = '/api/sys/user/updatePassword'
 }
 
 export const reqUserInfo = (current: number, pageSize: number, username: string, phone: string, nickname: string, status: string, gender: string) =>
@@ -42,3 +43,6 @@ export const reqSelectUser = (idList: number[]) =>
 
 export const reqMenuListByUser = (data: any) =>
     request.post<any, any>(API.ALLROLEBYUSER_URl, data)
+
+export const reqUpdatePwd = (data: any) =>
+    request.post<any, any>(API.UPDATEPWD_URl, data)
