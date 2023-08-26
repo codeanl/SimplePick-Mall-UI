@@ -119,6 +119,16 @@ export const asyncRoute = [
                 },
             },
             {
+                path: '/pms/attributeCategory',
+                component: () => import('@/view/pms/attributeCategory/index.vue'),
+                name: 'AttributeCategory',
+                meta: {
+                    title: '属性分类管理',
+                    icon: 'Management',
+                    hidden: false,
+                },
+            },
+            {
                 path: '/pms/attribute',
                 component: () => import('@/view/pms/attribute/index.vue'),
                 name: 'Attribute',

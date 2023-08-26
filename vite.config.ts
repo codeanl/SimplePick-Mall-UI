@@ -7,6 +7,9 @@ import DefineOptions from 'unplugin-vue-define-options/vite'
 import VueSetupExtend from 'vite-plugin-vue-setup-extend'
 import path from 'path'
 
+// 引入svg
+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
+
 export default ({ command, mode }: ConfigEnv): UserConfigExport => {
   // 获取各种环境下对应的变量
   let env = loadEnv(mode, process.cwd())
@@ -21,6 +24,11 @@ export default ({ command, mode }: ConfigEnv): UserConfigExport => {
       }),
       Components({
         resolvers: [ElementPlusResolver()],
+      }),
+      //svg
+      createSvgIconsPlugin({
+        iconDirs: [path.resolve(process.cwd(), 'src/assets/icons')],
+        symbolId: 'icon-[dir]-[name]',
       }),
     ],
     resolve: { alias: { '@': path.resolve('./src') } },

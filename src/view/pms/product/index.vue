@@ -55,7 +55,7 @@
             <el-form-item label="所属分类">
                 <el-tree-select v-model="Params.categoryId" :data="CateListArr" check-strictly
                     :props="{ key: 'categoryId', label: 'name' }" node-key="id" :render-after-expand="false"
-                    @change="fetchAttributeList(Params.categoryId)" />
+                    @change="fetchAttributeList()" />
             </el-form-item>
             <el-form-item label="货号" prop="productSn">
                 <el-input placeholder="请您输入货号" v-model="Params.productSn"></el-input>
@@ -81,15 +81,9 @@
                     </el-icon>
                 </el-upload>
             </el-form-item>
-            <!--  -->
-            <!-- <el-form-item label="属性列表" prop="attrList">
-                <el-select v-model="Params.attrList" placeholder="请选择属性">
-                    <el-option v-for="attr in AttrArr" :key="attr.id" :label="attr.name" :value="attr.value" />
-                </el-select>
-            </el-form-item> -->
         </el-form>
+        <!-- 照片墙 -->
         <el-form :model="Params" :inline="true">
-            <!--  -->
             <el-upload v-model:file-list="fileList" action="/api/api/sys/upload" list-type="picture-card"
                 :on-preview="handlePictureCardPreview" :on-remove="handleRemove" :on-success="handleAvatarSuccess1">
                 <el-icon>
@@ -99,33 +93,32 @@
             <el-dialog v-model="dialogVisible">
                 <img w-full :src="dialogImageUrl" alt="Preview Image" />
             </el-dialog>
-            <!--  -->
         </el-form>
-        <el-form :model="Params.size" :inline="true">
-            <el-input v-model="newAttributeName" placeholder="请输入属性名字"></el-input>
-            <el-button style="margin-left: 10px" type="primary" size="default" icon="Plus" @click="addAttribute">
-                添加属性
-            </el-button>
-            <el-table border style="margin: 10px 0" :data="Params.size">
-                <el-table-column label="销售属性名字" width="120px" prop="name"></el-table-column>
-                <el-table-column label="销售属性值">
-                    <template #="{ row, $index }">
-                        <el-tag v-for="(item) in row.sizeValue" :key="row.id" class="mx-1" closable style="margin: 0 8px"
-                            @close="row.sizeValue.splice($index, 1)">
-                            {{ item }}
-                        </el-tag>
-                        <el-input v-model="newTagValue" placeholder="请输入属性值" size="small" style="width: 50px"></el-input>
-                        <el-button size=" small" icon="Plus" @click="addTagValue(row)"></el-button>
-                    </template>
-                </el-table-column>
-                <el-table-column label="操作" width="120px">
-                    <template #="{ row, $index }">
-                        <el-button type="danger" size="small" icon="Delete"
-                            @click="Params.size.splice($index, 1)"></el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
+        <!--  -->
+        <!-- <div v-for="(attribute, index) in Params.attributeType2" :key="index">
+            <span>{{ attribute.name }}：</span>
+            <el-select v-model="Params.attributeType2[index]" placeholder="请选择">
+                <el-option v-for="(valueObj, valueIndex) in attribute.values" :key="valueIndex" :label="valueObj.value"
+                    :value="valueObj.value"></el-option>
+            </el-select>
+        </div> -->
+        <el-form :model="Params" :inline="true">
+            <el-form-item prop="attrList" v-for="(attribute, index) in Params.attributeType1" :key="index"
+                :label="attribute.name">
+                <el-select v-model="selectedValue[index]" placeholder="请选择">
+                    <el-option v-for="(valueObj, valueIndex) in convertToArray(attribute.value)" :key="valueIndex"
+                        :label="valueObj" :value="valueObj"></el-option>
+                </el-select>
+            </el-form-item>
         </el-form>
+        <el-form :model="Params" :inline="true">
+            <div v-for="(attribute, index) in Params.attributeType2" :key="index" :label="attribute.name">
+                <el-checkbox v-model="attribute[valueIndex]"
+                    v-for="(valueObj, valueIndex) in convertToArray(attribute.value)" :key="valueIndex" :label="valueObj"
+                    :value="valueObj" />
+            </div>
+        </el-form>
+        <!--  -->
         <template #footer>
             <div style="flex: auto">
                 <el-button @click="cancel">取消</el-button>
@@ -216,12 +209,16 @@ import type { UploadProps, UploadUserFile } from 'element-plus'
 
 const fileList = ref<UploadUserFile[]>([])
 
+let selectedValue = ref<any>([])
+// 
+
+// 
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
-
+const checked3 = ref(false)
 const handleRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
     console.log(uploadFile, uploadFiles)
-    Params.imgUrl = Params.imgUrl.filter((item) => item !== uploadFile.url);
+    Params.imgUrl = Params.imgUrl.filter((item: string | undefined) => item !== uploadFile.url);
 }
 
 
@@ -229,13 +226,16 @@ const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
     dialogImageUrl.value = uploadFile.url!
     dialogVisible.value = true
 }
-
+let ddd = ref<any>([])
+let selectedValues = ref<any>([])
+let convertToArray = (value: any) => {
+    return value.split(","); // 将字符串转换为数组
+}
 // -----------------------------------------------
 import { ref, onMounted, reactive } from 'vue'
 import { reqAllProduct, reqAddOrUpdate, reqRemove, reqSku, reqRemoveSKU, reqAddOrUpdateSKU, reqProductInfo } from '@/api/pms/product'
 import { reqAll } from '@/api/pms/category'
 import { reqAllAttribute } from '@/api/pms/attribute'
-
 //默认页码
 let pageNo = ref<number>(1)
 //默认个数
@@ -244,7 +244,8 @@ let total = ref<number>(0)
 //数据列表
 let listArr = ref<any>([])
 let skuArr = ref<any>([])
-let AttrArr = ref<any>([])
+let attrType1 = ref<any>([])
+let attrType2 = ref<any>([])
 let AttrValueIDs = ref<any>([])
 //收集删除的id
 let ids = ref<number[]>([])
@@ -280,7 +281,9 @@ const Params = reactive<any>({
     attributeValue: [],
     size: [{ name: '', sizeValue: [] }],
     sizeList: [],
-    imgUrl: []
+    imgUrl: [],
+    attributeType1: [],
+    attributeType2: [],
 })
 
 let SkuParams = reactive<any>({
@@ -320,6 +323,9 @@ const getHas = async (pager = 1) => {
 const cancel = () => {
     drawer.value = false
 }
+
+let attributeArr = ref<any>([])
+let sizeArr = ref<any>([])
 // 编辑按钮
 const update = async (row: any) => {
     fileList.value = []
@@ -336,9 +342,11 @@ const update = async (row: any) => {
         attributeValueID: [],
         size: [],
         imgUrl: [],
+        attributeType1: [],
+        attributeType2: [],
     })
     drawer.value = true
-    fetchAttributeList(row.categoryId)
+    fetchAttributeList()
     AttrValueIDs.value = row.attrValueIds
     let res = await reqProductInfo({ id: row.id })
     if (res.code == 200) {
@@ -358,14 +366,21 @@ const update = async (row: any) => {
             sizeList: res.data.sizeList,
             imgUrl: res.data.imgUrl,
         })
-        res.data.sizeList.forEach(item => {
-            const sizeItem = {
-                name: item.name,
-                sizeValue: item.sizeValue.map(value => value.name)
-            };
-            Params.size.push(sizeItem);
-        });
-        fileList.value = Params.imgUrl.map((url) => ({
+        // res.data.attributeValue.attributeType1.forEach((item: { name: any; values: any[]; }) => {
+        //     const sizeItem = {
+        //         name: item.name,
+        //         values: item.values.map((value: any) => value)
+        //     };
+        //     Params.attributeType1.push(sizeItem);
+        // });
+        // res.data.attributeValue.attributeType2.forEach((item: { name: any; values: any[]; }) => {
+        //     const sizeItem = {
+        //         name: item.name,
+        //         values: item.values.map((value: any) => value)
+        //     };
+        //     Params.attributeType2.push(sizeItem);
+        // });
+        fileList.value = Params.imgUrl.map((url: string) => ({
             name: url.substring(url.lastIndexOf('/') + 1),
             url: url
         }));
@@ -385,6 +400,17 @@ const add = () => {
 
 //窗口保存按钮
 const save = async () => {
+    selectedValue.value = selectedValue.value.map((Value, index) => {
+        const attribute = Params.attributeType1[index];
+        return {
+            attributeID: attribute.attributeCategoryID,
+            value: Value
+        };
+    });
+    console.log(selectedValue.value);
+
+    // 在这里将 selectedOptions 发送给后端或进行其他处理
+    // 
     // 将 originalPrice 字段转换为 float64 类型
     Params.originalPrice = parseFloat(Params.originalPrice);
     Params.price = parseFloat(Params.price);
@@ -405,6 +431,8 @@ const save = async () => {
             message: Params.id ? '更新失败' : '添加失败',
         })
     }
+
+
 }
 
 //批量删除用户按钮
@@ -539,10 +567,14 @@ const savesku = async () => {
     }
 }
 
-let fetchAttributeList = async (categoryId: number) => {
-    let res = await reqAllAttribute(1, 100, '', '', categoryId)
+let fetchAttributeList = async () => {
+    let res = await reqAllAttribute(1, 100, '', '1', 0)
+    let res1 = await reqAllAttribute(1, 100, '', "2", 0)
     if (res.code == 200) {
-        AttrArr.value = res.data
+        Params.attributeType1 = res.data
+    }
+    if (res1.code == 200) {
+        Params.attributeType2 = res1.data
     }
 }
 // -------------------------------
@@ -550,7 +582,6 @@ let newTagValue = ref<any>([])
 let newAttributeName = ref<any>([])
 let addAttribute = () => {
     console.log(newAttributeName.value);
-
     if (newAttributeName.value) {
         Params.size.push({
             name: newAttributeName.value,

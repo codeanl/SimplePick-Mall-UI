@@ -17,6 +17,10 @@ import 'element-plus/theme-chalk/dark/css-vars.css'
 app.use(ElementPlus, {
     locale: zhCn,
 })
+//echarts
+import "echarts";
+import ECharts from 'vue-echarts'
+app.component('v-chart', ECharts)
 
 //引入路由 
 import router from './router'
@@ -29,6 +33,9 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
     app.component(key, component)
 }
+// svg插件需要配置代码
+import 'virtual:svg-icons-register'
+
 //引入自定义插件全局
 import globalComponent from '@/components'
 app.use(globalComponent)
