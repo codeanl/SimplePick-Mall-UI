@@ -1,11 +1,32 @@
 <template>
+    <!-- 上边搜索 -->
+    <el-card style="height: 80px">
+        <el-form :inline="true" class="form">
+            <el-form-item label="用户名:">
+                <el-input placeholder="请输入搜索的用户名" v-model="name"></el-input>
+            </el-form-item>
+            <el-form-item label="分类:">
+                <el-tree-select v-model="CateID" :data="CateListArr" check-strictly
+                    :props="{ key: 'categoryId', label: 'name' }" node-key="id" :render-after-expand="false" />
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" size="default" @click="search" :disabled="name || CateID ? false : true">
+                    搜索
+                </el-button>
+                <el-button size="default" @click="reset">重置</el-button>
+            </el-form-item>
+        </el-form>
+    </el-card>
+    <!-- 数据展示 -->
     <el-card style="margin: 10px 0">
+        <!-- 上边按钮 -->
         <el-button type="success" size="default" @click="add">
             添加用户
         </el-button>
         <el-button type="danger" size="default" @click="deleteSelect" :disabled="selectIdArr.length ? false : true">
             批量删除
         </el-button>
+        <!-- 数据 -->
         <el-table border :data="listArr" @selection-change="selectChange">
             <el-table-column type="selection" align="center" width="30px"></el-table-column>
             <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
@@ -35,9 +56,6 @@
                     <el-button type="primary" size="small" icon="Edit" @click="look(row.id)">
                         查看
                     </el-button>
-                    <el-button type="primary" size="small" icon="Edit" @click="addSku(row)">
-                        添加
-                    </el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -46,16 +64,20 @@
             :background="true" layout="prev, pager, next, jumper, -> , sizes, total" :total="total" @current-change="getHas"
             @size-change="handler" />
     </el-card>
-    <!-- 抽屉  完成 添加｜修改 的窗口 -->
+    <!--  -->
     <el-dialog v-model="drawer" :title="Params.id ? '更新' : '添加'">
-        <el-form :model="Params" ref="formRef" :inline="true">
+        <el-form :model="Params" ref="formRef">
             <el-form-item label="名称" prop="name">
                 <el-input placeholder="请您输入名称" v-model="Params.name"></el-input>
             </el-form-item>
             <el-form-item label="所属分类">
                 <el-tree-select v-model="Params.categoryId" :data="CateListArr" check-strictly
-                    :props="{ key: 'categoryId', label: 'name' }" node-key="id" :render-after-expand="false"
-                    @change="fetchAttributeList()" />
+                    :props="{ key: 'categoryId', label: 'name' }" node-key="id" :render-after-expand="false" />
+            </el-form-item>
+            <el-form-item label="所属属性分类">
+                <el-tree-select v-model="Params.attributeCategoryID" :data="attrCateListArr" check-strictly
+                    :props="{ key: 'attributeCategoryID', label: 'name' }" node-key="id" :render-after-expand="false"
+                    @change="changeAttrCate" />
             </el-form-item>
             <el-form-item label="货号" prop="productSn">
                 <el-input placeholder="请您输入货号" v-model="Params.productSn"></el-input>
@@ -95,13 +117,7 @@
             </el-dialog>
         </el-form>
         <!--  -->
-        <!-- <div v-for="(attribute, index) in Params.attributeType2" :key="index">
-            <span>{{ attribute.name }}：</span>
-            <el-select v-model="Params.attributeType2[index]" placeholder="请选择">
-                <el-option v-for="(valueObj, valueIndex) in attribute.values" :key="valueIndex" :label="valueObj.value"
-                    :value="valueObj.value"></el-option>
-            </el-select>
-        </div> -->
+        <!-- ---------------------------------------- -->
         <el-form :model="Params" :inline="true">
             <el-form-item prop="attrList" v-for="(attribute, index) in Params.attributeType1" :key="index"
                 :label="attribute.name">
@@ -111,14 +127,17 @@
                 </el-select>
             </el-form-item>
         </el-form>
-        <el-form :model="Params" :inline="true">
-            <div v-for="(attribute, index) in Params.attributeType2" :key="index" :label="attribute.name">
-                <el-checkbox v-model="attribute[valueIndex]"
-                    v-for="(valueObj, valueIndex) in convertToArray(attribute.value)" :key="valueIndex" :label="valueObj"
-                    :value="valueObj" />
-            </div>
-        </el-form>
+
         <!--  -->
+        <el-form :model="Params" :inline="true">
+            <el-checkbox-group v-model="selectedValue1[index]" v-for="(attribute, index) in Params.attributeType2"
+                :label="attribute.name">
+                <el-checkbox v-for="(valueObj, valueIndex) in convertToArray(attribute.value)" :label="valueObj"
+                    :key="valueIndex" :value="valueObj" />
+            </el-checkbox-group>
+        </el-form>
+        <!-- ---------------------------------------- -->
+        <!-- 按钮 -->
         <template #footer>
             <div style="flex: auto">
                 <el-button @click="cancel">取消</el-button>
@@ -145,13 +164,6 @@
                     <el-button type="primary" size="small" icon="Edit" @click="updatesku(row)">
                         编辑
                     </el-button>
-                    <el-popconfirm :title="`你确定删除${row.name}`" width="260px" @confirm="deleteSku(row.id)">
-                        <template #reference>
-                            <el-button type="danger" size="small" icon="Delete">
-                                删除
-                            </el-button>
-                        </template>
-                    </el-popconfirm>
                 </template>
             </el-table-column>
         </el-table>
@@ -190,7 +202,6 @@
                     </el-icon>
                 </el-upload>
             </el-form-item>
-
         </el-form>
         <template #footer>
             <div style="flex: auto">
@@ -202,71 +213,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Plus } from '@element-plus/icons-vue'
-
-import type { UploadProps, UploadUserFile } from 'element-plus'
-
-const fileList = ref<UploadUserFile[]>([])
-
-let selectedValue = ref<any>([])
-// 
-
-// 
-const dialogImageUrl = ref('')
-const dialogVisible = ref(false)
-const checked3 = ref(false)
-const handleRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
-    console.log(uploadFile, uploadFiles)
-    Params.imgUrl = Params.imgUrl.filter((item: string | undefined) => item !== uploadFile.url);
-}
-
-
-const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
-    dialogImageUrl.value = uploadFile.url!
-    dialogVisible.value = true
-}
-let ddd = ref<any>([])
-let selectedValues = ref<any>([])
-let convertToArray = (value: any) => {
-    return value.split(","); // 将字符串转换为数组
-}
-// -----------------------------------------------
 import { ref, onMounted, reactive } from 'vue'
 import { reqAllProduct, reqAddOrUpdate, reqRemove, reqSku, reqRemoveSKU, reqAddOrUpdateSKU, reqProductInfo } from '@/api/pms/product'
 import { reqAll } from '@/api/pms/category'
 import { reqAllAttribute } from '@/api/pms/attribute'
-//默认页码
+import { reqAllattributeCategory } from '@/api/pms/attributeCategory'
+//数据
+let name = ref<string>('')
+let CateID = ref<number>()
+//分页数据
 let pageNo = ref<number>(1)
-//默认个数
 let pageSize = ref<number>(10)
 let total = ref<number>(0)
-//数据列表
-let listArr = ref<any>([])
-let skuArr = ref<any>([])
-let attrType1 = ref<any>([])
-let attrType2 = ref<any>([])
-let AttrValueIDs = ref<any>([])
-//收集删除的id
-let ids = ref<number[]>([])
-//多选框选择的id
-let selectIdArr = ref<any[]>([])
-//复选框选择
-const selectChange = (value: any) => {
-    selectIdArr.value = value
-}
 //下拉改变
 const handler = () => {
     getHas()
 }
-//分类
-let CateListArr = ref<any>([]);
-//组件实例
-let formRef = ref<any>()
-//定义响应式数据 抽屉的显示隐藏
-let drawer = ref<boolean>(false)
-let drawer1 = ref<boolean>(false)
-let drawer2 = ref<boolean>(false)
+
 const Params = reactive<any>({
     id: 0,
     categoryId: 0,
@@ -284,8 +247,9 @@ const Params = reactive<any>({
     imgUrl: [],
     attributeType1: [],
     attributeType2: [],
+    attributeValueList: [],
+    attributeCategoryID: 0,
 })
-
 let SkuParams = reactive<any>({
     productId: 0,
     name: '',
@@ -302,12 +266,19 @@ let SkuParams = reactive<any>({
 onMounted(() => {
     getHas()
 })
+//数据列表
+let listArr = ref<any>([])
+//分类
+let CateListArr = ref<any>([]);
+let attrCateListArr = ref<any>([]);
 //获取信息
 const getHas = async (pager = 1) => {
     pageNo.value = pager
     let res: any = await reqAllProduct(
         pageNo.value,
         pageSize.value,
+        name.value,
+        CateID.value,
     )
     if (res.code == 200) {
         total.value = res.total
@@ -318,123 +289,32 @@ const getHas = async (pager = 1) => {
         CateListArr.value = res1.data
     }
 }
-
-//取消按钮
-const cancel = () => {
-    drawer.value = false
-}
-
-let attributeArr = ref<any>([])
-let sizeArr = ref<any>([])
-// 编辑按钮
-const update = async (row: any) => {
-    fileList.value = []
-    Object.assign(Params, {
-        id: 0,
-        categoryId: 0,
-        name: '',
-        pic: '',
-        desc: '',
-        price: '',
-        originalPrice: 0,
-        unit: '',
-        productSn: '',
-        attributeValueID: [],
-        size: [],
-        imgUrl: [],
-        attributeType1: [],
-        attributeType2: [],
-    })
-    drawer.value = true
-    fetchAttributeList()
-    AttrValueIDs.value = row.attrValueIds
-    let res = await reqProductInfo({ id: row.id })
+let fetchAttributeList = async (id: number) => {
+    let res = await reqAllAttribute(1, 100, '', '1', id)
+    let res1 = await reqAllAttribute(1, 100, '', "2", id)
     if (res.code == 200) {
-        // 初始化 Params.size
-        Params.size = []
-        Object.assign(Params, {
-            id: res.data.productInfo.id,
-            categoryId: res.data.productInfo.categoryId,
-            name: res.data.productInfo.name,
-            pic: res.data.productInfo.pic,
-            desc: res.data.productInfo.desc,
-            price: res.data.productInfo.price,
-            originalPrice: res.data.productInfo.originalPrice,
-            unit: res.data.productInfo.unit,
-            productSn: res.data.productInfo.productSn,
-            attributeValue: res.data.attributeValue,
-            sizeList: res.data.sizeList,
-            imgUrl: res.data.imgUrl,
-        })
-        // res.data.attributeValue.attributeType1.forEach((item: { name: any; values: any[]; }) => {
-        //     const sizeItem = {
-        //         name: item.name,
-        //         values: item.values.map((value: any) => value)
-        //     };
-        //     Params.attributeType1.push(sizeItem);
-        // });
-        // res.data.attributeValue.attributeType2.forEach((item: { name: any; values: any[]; }) => {
-        //     const sizeItem = {
-        //         name: item.name,
-        //         values: item.values.map((value: any) => value)
-        //     };
-        //     Params.attributeType2.push(sizeItem);
-        // });
-        fileList.value = Params.imgUrl.map((url: string) => ({
-            name: url.substring(url.lastIndexOf('/') + 1),
-            url: url
-        }));
+        Params.attributeType1 = res.data
     }
-
-}
-//添加用户按钮
-const add = () => {
-    drawer.value = true
-    //存储收集已有的账号信息
-    // 清空Params对象
-    fileList.value = []
-    Object.keys(Params).forEach(key => {
-        Params[key] = Array.isArray(Params[key]) ? [] : '';
-    });
-}
-
-//窗口保存按钮
-const save = async () => {
-    selectedValue.value = selectedValue.value.map((Value, index) => {
-        const attribute = Params.attributeType1[index];
-        return {
-            attributeID: attribute.attributeCategoryID,
-            value: Value
-        };
-    });
-    console.log(selectedValue.value);
-
-    // 在这里将 selectedOptions 发送给后端或进行其他处理
-    // 
-    // 将 originalPrice 字段转换为 float64 类型
-    Params.originalPrice = parseFloat(Params.originalPrice);
-    Params.price = parseFloat(Params.price);
-
-    let res: any = await reqAddOrUpdate(Params)
-    if (res.code == 200) {
-        drawer.value = false
-        ElMessage({
-            type: 'success',
-            message: Params.id ? '更新成功' : '添加成功',
-        })
-        // window.location.reload()
-        getHas()
-    } else {
-        drawer.value = false
-        ElMessage({
-            type: 'error',
-            message: Params.id ? '更新失败' : '添加失败',
-        })
+    if (res1.code == 200) {
+        Params.attributeType2 = res1.data
     }
-
-
+    getAllattributeCategory()
+}
+let getAllattributeCategory = async () => {
+    let res2: any = await reqAllattributeCategory()
+    if (res2.code === 200) {
+        attrCateListArr.value = res2.data
+    }
 }
 
+//多选框选择的id
+let selectIdArr = ref<any[]>([])
+//复选框选择
+const selectChange = (value: any) => {
+    selectIdArr.value = value
+}
+//收集删除的id
+let ids = ref<number[]>([])
 //批量删除用户按钮
 const deleteSelect = async () => {
     ids.value = selectIdArr.value.map((item) => {
@@ -457,8 +337,131 @@ const deleteproduct = async (id: number) => {
         getHas(listArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
     }
 }
+
+//定义响应式数据 抽屉的显示隐藏
+let drawer = ref<boolean>(false)
+let drawer1 = ref<boolean>(false)
+let drawer2 = ref<boolean>(false)
+//取消按钮
+const cancel = () => {
+    drawer.value = false
+}
+
+const fileList = ref<UploadUserFile[]>([])
+//添加用户按钮
+const add = () => {
+    drawer.value = true
+    //存储收集已有的账号信息
+    fileList.value = []
+    // 清空Params对象
+    Object.keys(Params).forEach(key => {
+        Params[key] = Array.isArray(Params[key]) ? [] : '';
+    });
+    selectedValue.value = []
+    selectedValue1.value = []
+    getAllattributeCategory()
+}
+
+
+// 编辑按钮
+const update = async (row: any) => {
+    drawer.value = true
+    // 清空Params对象
+    Object.keys(Params).forEach(key => {
+        Params[key] = Array.isArray(Params[key]) ? [] : '';
+    });
+    selectedValue.value = []
+    let res = await reqProductInfo({ id: row.id })
+    if (res.code == 200) {
+        // 初始化 Params.size
+        Params.size = []
+        Object.assign(Params, {
+            id: res.data.productInfo.id,
+            categoryId: res.data.productInfo.categoryId,
+            name: res.data.productInfo.name,
+            pic: res.data.productInfo.pic,
+            desc: res.data.productInfo.desc,
+            price: res.data.productInfo.price,
+            originalPrice: res.data.productInfo.originalPrice,
+            unit: res.data.productInfo.unit,
+            productSn: res.data.productInfo.productSn,
+            attributeValue: res.data.attributeValue,
+            sizeList: res.data.sizeList,
+            imgUrl: res.data.imgUrl,
+            attributeCategoryID: res.data.productInfo.attributeCategoryID,
+        })
+        fetchAttributeList(res.data.productInfo.attributeCategoryID)
+        fileList.value = Params.imgUrl.map((url: string) => ({
+            name: url.substring(url.lastIndexOf('/') + 1),
+            url: url
+        }));
+        selectedValue.value = res.data.attributeValue.attributeType1.map((item: { values: { value: any; }[]; }) => item.values[0].value);
+        // selectedValue1.value = res.data.attributeValue.attributeType2.map(item => item.values[0].value);
+    }
+}
+//type1
+let selectedValue = ref<any>([])
+//type2
+let selectedValue1 = ref<any>([])
+let convertToArray = (value: any) => {
+    return value.split(","); // 将字符串转换为数组
+}
+const save = async () => {
+    selectedValue.value = selectedValue.value.map((Value: any, index: string | number) => {
+        const attribute = Params.attributeType1[index];
+        return {
+            attributeID: attribute.id,
+            value: [Value]
+        };
+    })
+    selectedValue1.value = selectedValue1.value.map((Value: any, index: string | number) => {
+        const attribute1 = Params.attributeType2[index];
+        return {
+            attributeID: attribute1.id,
+            value: Value
+        };
+    });
+    for (let i = 0; i < selectedValue1.value.length; i++) {
+        Params.attributeValueList.push(selectedValue1.value[i])
+    }
+    for (let i = 0; i < selectedValue.value.length; i++) {
+        Params.attributeValueList.push(selectedValue.value[i])
+    }
+    Params.originalPrice = parseFloat(Params.originalPrice);
+    Params.price = parseFloat(Params.price);
+    let res: any = await reqAddOrUpdate(Params)
+    if (res.code == 200) {
+        drawer.value = false
+        ElMessage({
+            type: 'success',
+            message: Params.id ? '更新成功' : '添加成功',
+        })
+        // window.location.reload()
+        getHas()
+    } else {
+        drawer.value = false
+        ElMessage({
+            type: 'error',
+            message: Params.id ? '更新失败' : '添加失败',
+        })
+    }
+}
+
+
+const dialogImageUrl = ref('')
+const dialogVisible = ref(false)
+const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
+    dialogImageUrl.value = uploadFile.url!
+    dialogVisible.value = true
+}
+const handleRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
+    console.log(uploadFile, uploadFiles)
+    Params.imgUrl = Params.imgUrl.filter((item: string | undefined) => item !== uploadFile.url);
+}
+//图片上传
 import type { UploadProps } from 'element-plus'
-import { size } from 'lodash';
+//组件实例
+let formRef = ref<any>()
 //图片上传成功的钩子
 const handleAvatarSuccess: UploadProps['onSuccess'] = (response) => {
     //上传返回的数据 图片url  uploadFile
@@ -496,41 +499,13 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
     }
 }
 
+let skuArr = ref<any>([])
 let look = async (id: number) => {
     drawer1.value = true
     let res: any = await reqSku({ productID: id })
     if (res.code == 200) {
         skuArr.value = res.data
     }
-}
-// 删除sku按钮
-const deleteSku = async (id: number) => {
-    ids.value = []
-    ids.value.push(id);
-    const requestData: any = { ids: ids.value };
-    let res: any = await reqRemoveSKU(requestData);
-    if (res.code == 200) {
-        ElMessage({ type: 'success', message: '删除成功' })
-        drawer1.value = false
-    }
-}
-// 添加sku按钮
-const addSku = (row: any) => {
-    Object.assign(SkuParams, {
-        id: 0,
-        productId: row.id,
-        name: '',
-        pic: '',
-        skuSn: '',
-        desc: '',
-        stock: 0,
-        description: '',
-        price: '',
-        AttributeShopValueID: [],
-        sizeList: row.sizeList
-    })
-    drawer2.value = true
-
 }
 
 // 更新sku按钮
@@ -548,7 +523,6 @@ const cancelsku = () => {
 const savesku = async () => {
     SkuParams.stock = parseInt(SkuParams.stock);
     SkuParams.price = parseFloat(SkuParams.price);
-
     let res: any = await reqAddOrUpdateSKU(SkuParams)
     if (res.code == 200) {
         drawer2.value = false
@@ -567,39 +541,28 @@ const savesku = async () => {
     }
 }
 
-let fetchAttributeList = async () => {
-    let res = await reqAllAttribute(1, 100, '', '1', 0)
-    let res1 = await reqAllAttribute(1, 100, '', "2", 0)
-    if (res.code == 200) {
-        Params.attributeType1 = res.data
-    }
-    if (res1.code == 200) {
-        Params.attributeType2 = res1.data
-    }
-}
-// -------------------------------
-let newTagValue = ref<any>([])
-let newAttributeName = ref<any>([])
-let addAttribute = () => {
-    console.log(newAttributeName.value);
-    if (newAttributeName.value) {
-        Params.size.push({
-            name: newAttributeName.value,
-            sizeValue: []
-        });
-        newAttributeName.value = ''; // 清空输入框
-    }
+let changeAttrCate = () => {
+    Params.attributeType1 = []
+    Params.attributeType2 = []
+    selectedValue.value = []
+    fetchAttributeList(Params.attributeCategoryID)
 }
 
-const addTagValue = (row: any) => {
-    if (newTagValue.value.trim() !== '') {
-        row.sizeValue.push(newTagValue.value);
-        newTagValue.value = ''; // 清空输入框
-    }
-};
+import useLayoutSettingStore from '@/store/setting'
+let settingStore = useLayoutSettingStore()
+//重置按钮
+const reset = () => {
+    settingStore.refresh = !settingStore.refresh
+}
+//搜索按钮
+const search = () => {
+    getHas()
+    name.value = ''
+    CateID.value = 0
+}
 </script>
 
-<style lang="scss" scoped></style>
+<style scoped></style>
 <style>
 .avatar-uploader .avatar {
     width: 178px;

@@ -141,14 +141,18 @@
             <el-form-item label="使用门槛" prop="minPoint">
                 <el-input placeholder="请您输入使用门槛" v-model="Params.minPoint"></el-input>
             </el-form-item>
-            <el-form-item label="开始时间" prop="startTime">
-                <el-input placeholder="请您输入开始时间" v-model="Params.startTime"></el-input>
+            <el-form-item label="起止时间" prop="endTime">
+                <div class="block">
+                    <el-date-picker v-model="Params.starEndTime" type="datetimerange" range-separator="到"
+                        start-placeholder="开始时间" end-placeholder="结束时间" value-format="YYYY-MM-DD HH:mm:ss" />
+                </div>
             </el-form-item>
-            <el-form-item label="结束时间" prop="endTime">
-                <el-input placeholder="请您输入结束时间" v-model="Params.endTime"></el-input>
-            </el-form-item>
-            <el-form-item label="开始领取时间" prop="enableTime">
-                <el-input placeholder="请您输入开始领取时间" v-model="Params.enableTime"></el-input>
+
+            <el-form-item label="领取时间" prop="enableTime">
+                <div class="block">
+                    <el-date-picker v-model="Params.enableTime" type="datetime" placeholder="请您输入开始领取时间"
+                        value-format="YYYY-MM-DD HH:mm:ss" />
+                </div>
             </el-form-item>
             <el-form-item label="备注" prop="note">
                 <el-input placeholder="请您输入备注" v-model="Params.note"></el-input>
@@ -209,6 +213,7 @@ let Params = reactive<any>({
     useType: '',
     note: '',
     code: '',
+    starEndTime: []
 })
 //组件挂载完毕
 onMounted(() => {
@@ -243,6 +248,8 @@ const save = async () => {
     Params.minPoint = parseFloat(Params.minPoint);
     Params.count = parseInt(Params.count);
     Params.perLimit = parseInt(Params.perLimit);
+    Params.startTime = Params.starEndTime[0]
+    Params.endTime = Params.starEndTime[1]
     let res: any = await reqAddOrUpdate(Params)
     if (res.code == 200) {
         drawer.value = false
@@ -277,6 +284,7 @@ const add = () => {
         useType: '',
         note: '',
         code: '',
+        starEndTime: []
     })
     nextTick(() => {
         formRef.value.clearValidate('name')
@@ -291,6 +299,8 @@ const add = () => {
 const update = (row: any) => {
     drawer.value = true
     Object.assign(Params, row)
+    Params.starEndTime.push(Params.startTime)
+    Params.starEndTime.push(Params.endTime)
     nextTick(() => {
         formRef.value.clearValidate('name')
         formRef.value.clearValidate('place')
@@ -335,4 +345,19 @@ const search = () => {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+.block {
+    border-right: solid 1px var(--el-border-color);
+    flex: 1;
+}
+
+.block:last-child {
+    border-right: none;
+}
+
+.block .demonstration {
+    display: block;
+    color: var(--el-text-color-secondary);
+    font-size: 14px;
+}
+</style>

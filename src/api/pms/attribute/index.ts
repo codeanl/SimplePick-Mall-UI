@@ -10,8 +10,8 @@ enum API {
 }
 
 
-export const reqAllAttribute = (current: number, pageSize: number, name: string, type: string, categoryId: number) =>
-  request.get<any, any>(API.All_URL, { params: { current, pageSize, name, type, categoryId } });
+export const reqAllAttribute = (current: number, pageSize: number, name: string, type: string, attributeCategoryID: number) =>
+  request.get<any, any>(API.All_URL, { params: { current, pageSize, name, type, attributeCategoryID } });
 
 
 export const reqAddOrUpdate = (data: any) => {

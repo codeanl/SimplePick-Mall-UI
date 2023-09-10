@@ -58,6 +58,13 @@
                     </template>
                 </template>
             </el-table-column>
+            <el-table-column label="状态" align="center" prop="status" show-overflow-tooltip width="60px">
+                <template #="{ row }">
+                    <el-switch v-model="row.status" class="ml-2"
+                        style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" active-value="1"
+                        inactive-value="0" @change="handleChange(row)" />
+                </template>
+            </el-table-column>
             <el-table-column label="创建时间" align="center" prop="creatTIme" show-overflow-tooltip></el-table-column>
             <el-table-column label="操作" width="300px" align="center">
                 <template #="{ row }">
@@ -139,13 +146,33 @@
     </el-dialog>
     <!-- 登录日志 -->
     <el-dialog v-model="drawer1" title="登录日志">
-        登录日志获取 开发中-----
+        <el-table border :data="loginLogListArr">
+            <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
+            <el-table-column label="IP" align="center" prop="ip" show-overflow-tooltip></el-table-column>
+            <el-table-column label="创建时间" align="center" prop="createTime" show-overflow-tooltip></el-table-column>
+            <el-table-column label="操作" width="300px" align="center">
+                <template #="{ row }">
+                    <el-popconfirm title="你确定删除吗" width="260px" @confirm="deleteLog(row.id)">
+                        <template #reference>
+                            <el-button type="danger" size="small" icon="Delete">
+                                删除
+                            </el-button>
+                        </template>
+                    </el-popconfirm>
+                </template>
+            </el-table-column>
+        </el-table>
+        <!-- 分页 -->
+        <el-pagination v-model:current-page="pageNo1" v-model:page-size="pageSize1" :page-sizes="[5, 10, 15, 20]"
+            :background="true" layout="prev, pager, next, jumper, -> , sizes, total" :total="total1"
+            @current-change="getLoginLog" @size-change="getLoginLog" />
     </el-dialog>
 </template>
 
 <script setup lang="ts">
 import { reqMemberAll, reqAddOrUpdateMember, reqDeleteMember } from '@/api/ums/member'
 import { ref, onMounted, reactive, nextTick } from 'vue'
+import { reqMemberLoginLogAll, reqDeleteMemberLoginLog } from '@/api/ums/memberLoginLog'
 //默认页码
 let pageNo = ref<number>(1)
 //默认个数
@@ -154,7 +181,7 @@ let total = ref<number>(0)
 //数据列表
 let ListArr = ref<any>([])
 //准备批量删除用户的id
-let selectIdArr = ref<User[]>([])
+let selectIdArr = ref<any>([])
 //收集删除的id
 let ids = ref<number[]>([])
 //复选框选择
@@ -328,9 +355,52 @@ const deleteSelectUser = async () => {
         getHas(ListArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
     }
 }
+
+//默认页码
+let pageNo1 = ref<number>(1)
+//默认个数
+let pageSize1 = ref<number>(10)
+let total1 = ref<number>(0)
+let loginLogListArr = ref<any>([])
+let nowMember = ref<any>()
+let loginLog = (id: number) => {
+    nowMember.value = id
+    getLoginLog()
+}
 //登录日志
-let loginLog = () => {
+let getLoginLog = async () => {
     drawer1.value = true
+    let res = await reqMemberLoginLogAll(
+        pageNo1.value,
+        pageSize1.value,
+        nowMember.value,
+    )
+    if (res.code == 200) {
+        total1.value = res.total
+        loginLogListArr.value = res.data
+    }
+}
+//状态修改用户
+let handleChange = async (row: any) => {
+    let data: any = {
+        id: row.id as number,
+        status: row.status
+    }
+    let res = await reqAddOrUpdateMember(data)
+    if (res.code == 200) {
+        ElMessage({ type: 'success', message: '修改状态成功' })
+    }
+}
+// 删除按钮
+const deleteLog = async (id: number) => {
+    ids.value = []
+    ids.value.push(id);
+    const requestData: any = { ids: ids.value }; // 提取 ids 引用的值并构造请求数据对象
+    let res: any = await reqDeleteMemberLoginLog(requestData);
+    if (res.code == 200) {
+        ElMessage({ type: 'success', message: '删除成功' })
+        getLoginLog()
+    }
 }
 </script>
 

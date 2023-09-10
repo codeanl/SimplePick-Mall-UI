@@ -25,8 +25,7 @@
             <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
             <el-table-column label="订单号" align="center" prop="orderSn" show-overflow-tooltip></el-table-column>
             <el-table-column label="用户名" align="center" prop="memberUserName" show-overflow-tooltip></el-table-column>
-            <el-table-column label="总金额" align="center" prop="memberUserName" show-overflow-tooltip></el-table-column>
-            <el-table-column label="因付金额" align="center" prop="payAmount" show-overflow-tooltip></el-table-column>
+
             <el-table-column label="支付方式" align="center" prop="payType" show-overflow-tooltip>
                 <template #="{ row }">
                     <template v-if="row.payType === '1'">
@@ -41,40 +40,7 @@
                     </template>
                 </template>
             </el-table-column>
-            <el-table-column label="状态" align="center" prop="status" show-overflow-tooltip>
-                <template #="{ row }">
-                    <template v-if="row.status === '0'">
-                        <el-tag key="item.label" class="mx-1" type="danger" effect="light">
-                            待付款
-                        </el-tag>
-                    </template>
-                    <template v-if="row.status === '1'">
-                        <el-tag key="item.label" class="mx-1" type="success" effect="light">
-                            待发货
-                        </el-tag>
-                    </template>
-                    <template v-if="row.status === '2'">
-                        <el-tag key="item.label" class="mx-1" type="success" effect="light">
-                            已发货
-                        </el-tag>
-                    </template>
-                    <template v-if="row.status === '3'">
-                        <el-tag key="item.label" class="mx-1" type="success" effect="light">
-                            已完成
-                        </el-tag>
-                    </template>
-                    <template v-if="row.status === '4'">
-                        <el-tag key="item.label" class="mx-1" type="success" effect="light">
-                            已关闭
-                        </el-tag>
-                    </template>
-                    <template v-if="row.status === '5'">
-                        <el-tag key="item.label" class="mx-1" type="success" effect="light">
-                            无效订单
-                        </el-tag>
-                    </template>
-                </template>
-            </el-table-column>
+
             <el-table-column label="订单类型" align="center" prop="orderType" show-overflow-tooltip>
                 <template #="{ row }">
                     <template v-if="row.orderType === '1'">
@@ -101,47 +67,14 @@
                     }}</span>
                 </template>
             </el-table-column>
-            <el-table-column label="操作" width="300px" align="center">
+            <el-table-column label="总金额" align="center" prop="totalAmount" show-overflow-tooltip>
                 <template #="{ row }">
-                    <el-button type="primary" size="small" icon="Edit" @click="look(row)">
-                        查看订单
-                    </el-button>
+                    <p style="color: red;">¥{{ row.totalAmount }}</p>
                 </template>
             </el-table-column>
-        </el-table>
-        <!-- 分页 -->
-        <el-pagination v-model:current-page="pageNo" v-model:page-size="pageSize" :page-sizes="[5, 10, 15, 20]"
-            :background="true" layout="prev, pager, next, jumper, -> , sizes, total" :total="total" @current-change="getHas"
-            @size-change="handler" />
-    </el-card>
-
-    <!-- 订单详情 -->
-    <el-dialog v-model="drawer" title="订单详情" width="70%">
-        <el-steps :active="2" align-center finish-status="success">
-            <el-step title="提交订单" description="Some description" />
-            <el-step title="支付订单" description="Some description" />
-            <el-step title="平台发货" description="Some description" />
-            <el-step title="确认收货" description="Some description" />
-            <el-step title="完成评价" description="Some description" />
-        </el-steps>
-        <h2>订单详情</h2>
-        <el-table :data="[orderInfo]">
-            <el-table-column label="订单号" align="center" prop="orderSn" show-overflow-tooltip></el-table-column>
-            <el-table-column label="用户名" align="center" prop="memberUserName" show-overflow-tooltip></el-table-column>
-            <el-table-column label="总金额" align="center" prop="memberUserName" show-overflow-tooltip></el-table-column>
-            <el-table-column label="因付金额" align="center" prop="payAmount" show-overflow-tooltip></el-table-column>
-            <el-table-column label="支付方式" align="center" prop="payType" show-overflow-tooltip>
+            <el-table-column label="因付金额" align="center" prop="payAmount" show-overflow-tooltip>
                 <template #="{ row }">
-                    <template v-if="row.payType === '1'">
-                        <el-tag key="item.label" class="mx-1" type="danger" effect="light">
-                            微信
-                        </el-tag>
-                    </template>
-                    <template v-if="row.payType === '2'">
-                        <el-tag key="item.label" class="mx-1" type="success" effect="light">
-                            支付宝
-                        </el-tag>
-                    </template>
+                    <p style="color: red;">¥{{ row.payAmount }}</p>
                 </template>
             </el-table-column>
             <el-table-column label="状态" align="center" prop="status" show-overflow-tooltip>
@@ -178,37 +111,46 @@
                     </template>
                 </template>
             </el-table-column>
-            <el-table-column label="订单类型" align="center" prop="orderType" show-overflow-tooltip>
+            <el-table-column label="操作" width="300px" align="center">
                 <template #="{ row }">
-                    <template v-if="row.orderType === '1'">
-                        <el-tag key="item.label" class="mx-1" type="danger" effect="light">
-                            正常订单
-                        </el-tag>
-                    </template>
-                    <template v-if="row.orderType === '2'">
-                        <el-tag key="item.label" class="mx-1" type="success" effect="light">
-                            秒杀订单
-                        </el-tag>
-                    </template>
-                </template>
-            </el-table-column>
-            <el-table-column label="备注" align="center" prop="note" show-overflow-tooltip></el-table-column>
-            <el-table-column label="支付时间" align="center" prop="paymentTime" show-overflow-tooltip></el-table-column>
-            <el-table-column label="发货时间" align="center" prop="deliveryTime" show-overflow-tooltip></el-table-column>
-            <el-table-column label="确认收货时间" align="center" prop="receiveTime" show-overflow-tooltip></el-table-column>
-            <el-table-column label="评论时间" align="center" prop="commentTime" show-overflow-tooltip></el-table-column>
-        </el-table>
-        <h2>收货人信息</h2>
-        <el-table :data="[orderInfo]">
-            <el-table-column label="收货人" align="center" prop="receiverName" show-overflow-tooltip></el-table-column>
-            <el-table-column label="联系电话" align="center" prop="receiverPhone" show-overflow-tooltip></el-table-column>
-            <el-table-column label="地址" align="center" show-overflow-tooltip>
-                <template #="{ row }">
-                    <span>{{ row.receiverProvince + row.receiverCity + row.receiverRegion + row.receiverDetailAddress
-                    }}</span>
+                    <el-button type="primary" size="small" icon="Edit" @click="look(row)">
+                        查看订单
+                    </el-button>
+                    <el-button v-if="row.status == '1'" type="success" size="small" icon="Edit" @click="addone(row)">
+                        订单发货
+                    </el-button>
+                    <el-button v-if="row.status == '2'" type="info" size="small" icon="Edit" @click="addone(row)">
+                        确认收货
+                    </el-button>
+                    <el-button v-if="row.status == '3'" type="danger" size="small" icon="Edit" @click="addone(row)">
+                        删除订单
+                    </el-button>
+                    <el-button v-if="row.status == '4'" type="warning" size="small" icon="Edit" @click="addone(row)">
+                        关闭订单
+                    </el-button>
+                    <el-button v-if="row.status == '5'" type="danger" size="small" icon="Edit">
+                        删除订单
+                    </el-button>
                 </template>
             </el-table-column>
         </el-table>
+        <!-- 分页 -->
+        <el-pagination v-model:current-page="pageNo" v-model:page-size="pageSize" :page-sizes="[5, 10, 15, 20]"
+            :background="true" layout="prev, pager, next, jumper, -> , sizes, total" :total="total" @current-change="getHas"
+            @size-change="handler" />
+    </el-card>
+
+    <!-- 订单详情 -->
+    <el-dialog v-model="drawer" title="订单详情" width="70%">
+        <el-steps :active="orderInfo?.status" align-center finish-status="success">
+            <!-- 0->待付款；1->待发货；2->已发货；3->确认收货；4->完成评价；5->无效订单 -->
+            <el-step title="支付订单" description="Some description" />
+            <el-step title="平台发货" description="Some description" />
+            <el-step title="确认收货" description="Some description" />
+            <el-step title="完成评价" description="Some description" />
+            <el-step title="订单结束" description="Some description" />
+        </el-steps>
+        <!--  -->
         <!-- 商品 -->
         <h2>商品信息</h2>
         <el-table :data="skuList">
@@ -220,30 +162,71 @@
             <el-table-column label="货号" align="center" prop="skuSn" show-overflow-tooltip></el-table-column>
             <el-table-column label="商品名称" align="center" prop="productName" show-overflow-tooltip></el-table-column>
             <el-table-column label="规格" align="center" prop="tag" show-overflow-tooltip width="300px"></el-table-column>
-            <el-table-column label="价格" align="center" prop="price" show-overflow-tooltip></el-table-column>
-        </el-table>
-        <!--  -->
-        <h2>自提点</h2>
-        <el-table :data="[placeInfo]">
-            <el-table-column label="自提点图片" align="center" prop="pic" show-overflow-tooltip width="120px">
+            <el-table-column label="价格" align="center" prop="price" show-overflow-tooltip>
                 <template #="{ row }">
-                    <img :src="row.pic" alt="自提点图片" style="width: 100px; height: auto;" />
+                    <p style="color: red;">¥{{ row.price }}</p>
                 </template>
             </el-table-column>
-            <el-table-column label="名称" align="center" prop="name" show-overflow-tooltip></el-table-column>
-            <el-table-column label="详细地址" align="center" prop="place" show-overflow-tooltip></el-table-column>
-            <el-table-column label="联系电话" align="center" prop="phone" show-overflow-tooltip></el-table-column>
         </el-table>
+        <!--  -->
+        <el-descriptions title="订单详情" direction="horizontal" :column="1" :size="size" border style="margin: 40px 0 0 20px;">
+            <el-descriptions-item label="订单号">{{ orderInfo?.orderSn }}</el-descriptions-item>
+            <el-descriptions-item label="用户名">{{ orderInfo?.memberUserName }}</el-descriptions-item>
+            <el-descriptions-item label="总金额">
+                <p style="color: red;">¥{{ orderInfo?.totalAmount }}</p>
+            </el-descriptions-item>
+            <el-descriptions-item label="因付金额">
+                <p style="color: red;">¥{{ orderInfo?.payAmount }}</p>
+            </el-descriptions-item>
+            <el-descriptions-item label="支付方式">
+                <el-tag class="mx-1" effect="dark" v-if="orderInfo?.payType == '1'">
+                    支付宝
+                </el-tag>
+                <el-tag class="mx-1" type="success" effect="dark" v-if="orderInfo?.payType == '2'">
+                    微信
+                </el-tag>
+
+            </el-descriptions-item>
+            <el-descriptions-item label="订单类型">
+                <el-tag class="mx-1" effect="dark" v-if="orderInfo?.orderType == '1'">
+                    正常订单
+                </el-tag>
+                <el-tag class="mx-1" type="success" effect="dark" v-if="orderInfo?.orderType == '2'">
+                    秒杀订单
+                </el-tag>
+            </el-descriptions-item>
+            <el-descriptions-item label="备注">{{ orderInfo?.note }}</el-descriptions-item>
+            <el-descriptions-item label="发货时间">{{ orderInfo?.deliveryTime }}</el-descriptions-item>
+            <el-descriptions-item label="确认收货时间">{{ orderInfo?.receiveTime }}</el-descriptions-item>
+            <el-descriptions-item label="评论时间">{{ orderInfo?.commentTime }}</el-descriptions-item>
+        </el-descriptions>
+        <!--  -->
+        <el-descriptions title="收货人信息" direction="horizontal" :column="1" :size="size" border
+            style="margin: 40px 0 0 20px;">
+            <el-descriptions-item label="收货人">{{ orderInfo?.receiverName }}</el-descriptions-item>
+            <el-descriptions-item label="联系电话">{{ orderInfo?.receiverPhone }}</el-descriptions-item>
+            <el-descriptions-item label="地址">{{ orderInfo?.receiverProvince
+            }}{{ orderInfo?.receiverCity }}{{ orderInfo?.receiverRegion }}</el-descriptions-item>
+        </el-descriptions>
+        <el-descriptions title="自提点信息" direction="horizontal" :column="1" :size="size" border
+            style="margin: 40px 0 0 20px;">
+            <el-descriptions-item label="自提点图片">
+                <img :src="placeInfo?.pic" alt="" style="width:200px">
+            </el-descriptions-item>
+            <el-descriptions-item label="名称">{{ placeInfo?.name }}</el-descriptions-item>
+            <el-descriptions-item label="详细地址">{{ placeInfo?.place }}</el-descriptions-item>
+            <el-descriptions-item label="联系电话">{{ placeInfo?.phone }}</el-descriptions-item>
+        </el-descriptions>
     </el-dialog>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { reqOrderAll, reqOrderInfo } from '@/api/oms/order'
+import { reqOrderAll, reqOrderInfo, reqAddOrUpdateOrder } from '@/api/oms/order'
 //setting仓库
 import useLayoutSettingStore from '@/store/setting'
 let settingStore = useLayoutSettingStore()
-
+const size = ref('')
 //默认页码
 let pageNo = ref<number>(1)
 //默认个数
@@ -303,6 +286,17 @@ let look = async (row: any) => {
         orderInfo.value = res.data.orderInfo
         skuList.value = res.data.skuList
         placeInfo.value = res.data.placeInfo
+    }
+}
+let addone = async (row: any) => {
+    let data: any = {
+        id: row.id as number,
+        status: String(parseInt(row.status) + 1)
+    }
+    let res = await reqAddOrUpdateOrder(data)
+    if (res.code === 200) {
+        ElMessage({ type: 'success', message: '修改成功' })
+        window.location.reload()
     }
 }
 </script>

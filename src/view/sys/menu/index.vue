@@ -15,7 +15,7 @@
                         </el-tag>
                     </template>
                     <template v-if="row.type === '2'">
-                        <el-tag key="item.label" class="mx-1" type="info" effect="light">
+                        <el-tag key="item.label" class="mx-1" type="danger" effect="light">
                             菜单
                         </el-tag>
                     </template>

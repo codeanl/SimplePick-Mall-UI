@@ -29,6 +29,7 @@ export const constantRoute = [
                     icon: 'HomeFilled',
                 },
             },
+
         ],
     },
     {
@@ -39,6 +40,39 @@ export const constantRoute = [
             title: '404',
             hidden: true,
         },
+    },
+    {
+        path: '/setting',
+        component: () => import('@/view/layout/index.vue'),
+        name: 'Setting',
+        meta: {
+            title: '系统设置',
+            hidden: false,
+            icon: 'Setting',
+        },
+        redirect: '/setting/profile',
+        children: [
+            {
+                path: '/setting/profile',
+                component: () => import('@/view/setting/profile/index.vue'),
+                name: 'Profile',
+                meta: {
+                    title: '个人设置',
+                    icon: 'User',
+                    hidden: false,
+                },
+            },
+            {
+                path: '/setting/setting',
+                component: () => import('@/view/setting/setting/index.vue'),
+                name: 'SystemSetting',
+                meta: {
+                    title: '系统设置',
+                    icon: 'Setting',
+                    hidden: false,
+                },
+            },
+        ],
     },
 
 ]
@@ -92,7 +126,7 @@ export const asyncRoute = [
                 meta: {
                     title: '自提点管理',
                     hidden: false,
-                    icon: 'List',
+                    icon: 'Position',
                 },
             },
         ],
@@ -124,7 +158,7 @@ export const asyncRoute = [
                 name: 'AttributeCategory',
                 meta: {
                     title: '属性分类管理',
-                    icon: 'Management',
+                    icon: 'CreditCard',
                     hidden: false,
                 },
             },
@@ -134,7 +168,7 @@ export const asyncRoute = [
                 name: 'Attribute',
                 meta: {
                     title: '属性管理',
-                    icon: 'Management',
+                    icon: 'Box',
                     hidden: false,
                 },
             },
@@ -144,7 +178,7 @@ export const asyncRoute = [
                 name: 'Product',
                 meta: {
                     title: '商品管理',
-                    icon: 'SetUp',
+                    icon: 'ShoppingCart',
                     hidden: false,
                 },
             },
@@ -157,7 +191,7 @@ export const asyncRoute = [
         meta: {
             title: '日志管理',
             hidden: false,
-            icon: 'Goods',
+            icon: 'ChatSquare',
         },
         redirect: '/log/loginLog',
         children: [
@@ -167,7 +201,7 @@ export const asyncRoute = [
                 name: 'LoginLog',
                 meta: {
                     title: '登录日志',
-                    icon: 'ShoppingCart',
+                    icon: 'ChatLineSquare',
                     hidden: false,
                 },
             },
@@ -177,7 +211,7 @@ export const asyncRoute = [
                 name: 'SysLog',
                 meta: {
                     title: '系统日志',
-                    icon: 'Management',
+                    icon: 'ChatDotSquare',
                     hidden: false,
                 },
             },
@@ -190,7 +224,7 @@ export const asyncRoute = [
         meta: {
             title: '会员管理',
             hidden: false,
-            icon: 'Goods',
+            icon: 'User',
         },
         redirect: '/ums/member',
         children: [
@@ -200,7 +234,7 @@ export const asyncRoute = [
                 name: 'Member',
                 meta: {
                     title: '会员管理',
-                    icon: 'ShoppingCart',
+                    icon: 'User',
                     hidden: false,
                 },
             },
@@ -214,7 +248,7 @@ export const asyncRoute = [
         meta: {
             title: '营销管理',
             hidden: false,
-            icon: 'Goods',
+            icon: 'MessageBox',
         },
         redirect: '/sms/coupon',
         children: [
@@ -224,7 +258,7 @@ export const asyncRoute = [
                 name: 'HomeAdvertise',
                 meta: {
                     title: '广告管理',
-                    icon: 'ShoppingCart',
+                    icon: 'Discount',
                     hidden: false,
                 },
             },
@@ -234,7 +268,7 @@ export const asyncRoute = [
                 name: 'Coupon',
                 meta: {
                     title: '优惠券管理',
-                    icon: 'ShoppingCart',
+                    icon: 'Ticket',
                     hidden: false,
                 },
             },
@@ -254,7 +288,7 @@ export const asyncRoute = [
                 name: 'SubjectProduct',
                 meta: {
                     title: '专题商品管理',
-                    icon: 'ShoppingCart',
+                    icon: 'Grid',
                     hidden: false,
                 },
             },
@@ -267,7 +301,7 @@ export const asyncRoute = [
         meta: {
             title: '订单管理',
             hidden: false,
-            icon: 'Goods',
+            icon: 'ShoppingCart',
         },
         redirect: '/oms/order',
         children: [
@@ -287,7 +321,7 @@ export const asyncRoute = [
                 name: 'ReturnApply',
                 meta: {
                     title: '退货管理',
-                    icon: 'ShoppingCart',
+                    icon: 'Sell',
                     hidden: false,
                 },
             },
@@ -297,45 +331,13 @@ export const asyncRoute = [
                 name: 'ReturnReason',
                 meta: {
                     title: '退货原因管理',
-                    icon: 'ShoppingCart',
+                    icon: 'SoldOut',
                     hidden: false,
                 },
             },
         ],
     },
-    {
-        path: '/setting',
-        component: () => import('@/view/layout/index.vue'),
-        name: 'Setting',
-        meta: {
-            title: '系统',
-            hidden: false,
-            icon: 'Goods',
-        },
-        redirect: '/setting/profile',
-        children: [
-            {
-                path: '/setting/profile',
-                component: () => import('@/view/setting/profile/index.vue'),
-                name: 'Profile',
-                meta: {
-                    title: '个人设置',
-                    icon: 'ShoppingCart',
-                    hidden: false,
-                },
-            },
-            {
-                path: '/setting/setting',
-                component: () => import('@/view/setting/setting/index.vue'),
-                name: 'SystemSetting',
-                meta: {
-                    title: '系统设置',
-                    icon: 'ShoppingCart',
-                    hidden: false,
-                },
-            },
-        ],
-    },
+
 ]
 
 export const anyRoute = {

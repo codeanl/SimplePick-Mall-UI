@@ -9,7 +9,7 @@
             <!-- <el-table-column prop="type" label="类型" /> -->
             <el-table-column label="图标" align="center" prop="icon" show-overflow-tooltip width="120px">
                 <template #="{ row }">
-                    <img :src="row.icon" alt="图标" style="width: 100px; height: auto;" />
+                    <img :src="row.icon" alt="图标" style="width: 80px; height: auto;" />
                 </template>
             </el-table-column>
             <el-table-column label="类型" align="center" prop="level" show-overflow-tooltip>
@@ -62,9 +62,6 @@
             <el-form-item label="父级id">
                 <el-tree-select v-model="Data.parentId" :data="ListArrWithRoot" check-strictly
                     :props="{ key: 'id', label: 'name' }" node-key="id" :render-after-expand="false" />
-            </el-form-item>
-            <el-form-item label="产品数量">
-                <el-input placeholder="请你输入产品数量" v-model="Data.productCount"></el-input>
             </el-form-item>
             <el-form-item label="商品单位">
                 <el-input placeholder="请你输入商品单位" v-model="Data.productUnit"></el-input>

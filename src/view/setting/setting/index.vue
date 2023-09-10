@@ -1,6 +1,6 @@
 <template>
     <div>
-        设置
+        设置功能---待开发
     </div>
 </template>
 

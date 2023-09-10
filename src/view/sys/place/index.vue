@@ -39,18 +39,11 @@
             <el-table-column label="名称" align="center" prop="name" show-overflow-tooltip></el-table-column>
             <el-table-column label="联系方式" align="center" prop="phone" show-overflow-tooltip></el-table-column>
             <el-table-column label="详细地址" align="center" prop="place" show-overflow-tooltip></el-table-column>
-            <el-table-column label="状态" align="center" prop="status" show-overflow-tooltip>
+            <el-table-column label="状态" align="center" prop="status" show-overflow-tooltip width="60px">
                 <template #="{ row }">
-                    <template v-if="row.status === '0'">
-                        <el-tag key="item.label" class="mx-1" type="danger" effect="light">
-                            暂停营业
-                        </el-tag>
-                    </template>
-                    <template v-if="row.status === '1'">
-                        <el-tag key="item.label" class="mx-1" type="success" effect="light">
-                            营业中
-                        </el-tag>
-                    </template>
+                    <el-switch v-model="row.status" class="ml-2"
+                        style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" active-value="1"
+                        inactive-value="0" @change="handleChange(row)" />
                 </template>
             </el-table-column>
             <el-table-column label="负责人" align="center" prop="principal" show-overflow-tooltip></el-table-column>
@@ -296,6 +289,18 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
             message: '上传的文件类型必须是PNG|JPG|GIF',
         })
         return false
+    }
+}
+
+//状态修改用户
+let handleChange = async (row: any) => {
+    let data: any = {
+        id: row.id as number,
+        status: row.status
+    }
+    let res = await reqAddOrUpdate(data)
+    if (res.code === 200) {
+        ElMessage({ type: 'success', message: '修改状态成功' })
     }
 }
 </script>

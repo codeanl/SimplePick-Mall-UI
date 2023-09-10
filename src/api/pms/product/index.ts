@@ -14,8 +14,8 @@ enum API {
 }
 
 
-export const reqAllProduct = (current: number, pageSize: number) =>
-    request.get<any, any>(API.All_URL, { params: { current, pageSize } });
+export const reqAllProduct = (current: number, pageSize: number, name: string, categoryId: number) =>
+    request.get<any, any>(API.All_URL, { params: { current, pageSize, name, categoryId } });
 
 
 export const reqAddOrUpdate = (data: any) => {

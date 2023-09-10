@@ -4,8 +4,8 @@
             <el-col :span="16"></el-col>
             <el-col :span="8">
                 <el-form class="login_form" :model="loginForm" :rules="rules" ref="loginForms">
-                    <h1>你好</h1>
-                    <h2>欢迎来到这里</h2>
+                    <h1>欢迎你</h1>
+                    <h2>感谢使用Zero-Admin</h2>
                     <el-form-item prop="username">
                         <el-input :prefix-icon="User" v-model="loginForm.username"> </el-input>
                     </el-form-item>
@@ -41,7 +41,7 @@ const rules = {
         { min: 6, max: 15, message: '长度在 6 到 15 个字符', trigger: 'blur' }]
 }
 
-//啊获取路由器
+//获取路由器
 import { useRouter } from 'vue-router'
 let router = useRouter()
 
@@ -82,7 +82,7 @@ const login = async () => {
 .login_container {
     width: 100%;
     height: 100vh;
-    background: url('@/assets/images/background.jpg') no-repeat;
+    background: url('@/assets/images/back.png') no-repeat;
     background-size: cover;
 
     .login_form {
@@ -95,12 +95,12 @@ const login = async () => {
 
         h1 {
             color: white;
-            font-size: 40px;
+            font-size: 30px;
         }
 
         h2 {
             color: white;
-            font-size: 30px;
+            font-size: 20px;
             margin: 20px 0px
         }
 

@@ -1,5 +1,5 @@
 <template>
-    <!-- 上边搜索 -->
+    <!-- 搜索 -->
     <el-card style="height: 80px">
         <el-form :inline="true" class="form">
             <el-form-item label="用户名:">
@@ -13,7 +13,7 @@
             </el-form-item>
             <el-form-item label="性别:">
                 <el-select v-model="gender" class="m-2" placeholder="请选择性别">
-                    <el-option label="未知" value="0" />
+                    <el-option label="保密" value="0" />
                     <el-option label="男" value="1" />
                     <el-option label="女" value="2" />
                 </el-select>
@@ -25,7 +25,6 @@
                 </el-select>
             </el-form-item>
             <el-form-item>
-                <!-- 搜索内容为空的时候搜索按钮禁用 -->
                 <el-button type="primary" size="default" @click="search"
                     :disabled="username.length || nickname.length || phone.length || gender.length || status.length ? false : true">
                     搜索
@@ -56,7 +55,7 @@
             <el-table-column label="性别" align="center" prop="gender" show-overflow-tooltip width="60px">
                 <template #="{ row }">
                     <template v-if="row.gender === '0'">
-                        未知
+                        保密
                     </template>
                     <template v-else-if="row.gender === '1'">
                         男
@@ -67,24 +66,28 @@
                 </template>
             </el-table-column>
             <el-table-column label="邮箱" align="center" prop="email" show-overflow-tooltip></el-table-column>
-
             <el-table-column label="用户角色" align="center" prop="roleName" show-overflow-tooltip></el-table-column>
-            <!-- <el-table-column label="创建者" align="center" prop="creat_by" show-overflow-tooltip></el-table-column> -->
             <el-table-column label="创建时间" align="center" prop="creat_at" show-overflow-tooltip></el-table-column>
-            <!-- <el-table-column label="更新者" align="center" prop="update_by" show-overflow-tooltip></el-table-column> -->
             <el-table-column label="更新时间" align="center" prop="update_at" show-overflow-tooltip></el-table-column>
             <el-table-column label="状态" align="center" prop="status" show-overflow-tooltip width="60px">
                 <template #="{ row }">
-                    <el-switch v-model="row.status" style="--el-switch-on-color: #13b8ce; " active-value="1"
+                    <el-switch v-model="row.status" class="ml-2"
+                        style="--el-switch-on-color: #13ce66; --el-switch-off-color: #5597ce" active-value="1"
                         inactive-value="0" @change="handleChange(row)" />
                 </template>
             </el-table-column>
-            <!-- 右边进行操作 -->
-            <el-table-column label="操作" width="300px" align="center">
+            <el-table-column label="操作" width="400px" align="center">
                 <template #="{ row }">
-                    <el-button type="warning" size="small" icon="User" @click="setRole(row)">
-                        分配角色
+                    <el-button type="success" size="small" icon="User" @click="setRole(row)">
+                        角色
                     </el-button>
+                    <el-popconfirm :title="`你确定要重置${row.username}的密码吗？`" width="260px" @confirm="ResetPassword(row.id)">
+                        <template #reference>
+                            <el-button type="warning" size="small" icon="Star">
+                                重置
+                            </el-button>
+                        </template>
+                    </el-popconfirm>
                     <el-button type="primary" size="small" icon="Edit" @click="updateUser(row)">
                         编辑
                     </el-button>
@@ -95,6 +98,7 @@
                             </el-button>
                         </template>
                     </el-popconfirm>
+
                 </template>
             </el-table-column>
         </el-table>
@@ -103,9 +107,9 @@
             :background="true" layout="prev, pager, next, jumper, -> , sizes, total" :total="total"
             @current-change="getHasUser" @size-change="handler" />
     </el-card>
-    <!-- 抽屉  完成 添加｜修改 的窗口 -->
+    <!-- 添加｜修改  -->
     <el-dialog v-model="drawer" :title="userParams.id ? '更新用户' : '添加用户'">
-        <el-form :model="userParams" :rules="rules" ref="formRef" :inline="true">
+        <el-form :model="userParams" :rules="rules" ref="formRef">
             <el-form-item label="用户名" prop="username">
                 <el-input placeholder="请您输入用户名" v-model="userParams.username"></el-input>
             </el-form-item>
@@ -120,7 +124,7 @@
             </el-form-item>
             <el-form-item label="性别" prop="gender">
                 <el-select v-model="userParams.gender" class="m-2" placeholder="请选择性别">
-                    <el-option label="未知" value="0" />
+                    <el-option label="保密" value="0" />
                     <el-option label="男" value="1" />
                     <el-option label="女" value="2" />
                 </el-select>
@@ -139,7 +143,7 @@
             </div>
         </template>
     </el-dialog>
-    <!-- 抽屉  职位分配 -->
+    <!--  职位分配 -->
     <el-drawer v-model="drawer1">
         <template #header>
             <h4>分配角色</h4>
@@ -150,7 +154,6 @@
                     <el-input v-model="userParams.username" :disabled="true"></el-input>
                 </el-form-item>
                 <el-form-item label="职位列表">
-                    <!-- indeterminate不确定状态 -->
                     <el-checkbox v-model="checkAll" :indeterminate="isIndeterminate" @change="handleCheckAllChange">
                         全选
                     </el-checkbox>
@@ -177,7 +180,8 @@ import {
     reqAddOrUpdateUser,
     reqAllRole,
     reqRemoveUser,
-    reqMenuListByUser
+    reqMenuListByUser,
+    resetPassword
 } from '@/api/sys/user'
 import type {
     Records,
@@ -196,6 +200,7 @@ let userArr = ref<Records>([])
 let username = ref<string>('')
 let nickname = ref<string>('')
 let phone = ref<string>('')
+let email = ref<string>('')
 let status = ref<string>('')
 let gender = ref<string>('')
 //收集用户信息
@@ -431,6 +436,13 @@ let handleChange = async (row: any) => {
         status: row.status
     }
     let res = await reqAddOrUpdateUser(data)
+    if (res.code === 200) {
+        ElMessage({ type: 'success', message: '修改状态成功' })
+    }
+}
+
+let ResetPassword = async (id: number) => {
+    let res = await resetPassword({ id: id })
     if (res.code === 200) {
         ElMessage({ type: 'success', message: '修改状态成功' })
     }

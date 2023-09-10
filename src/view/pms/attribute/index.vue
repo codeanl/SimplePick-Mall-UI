@@ -108,7 +108,7 @@ let total = ref<number>(0)
 //数据
 let name = ref<string>('')
 let type = ref<string>('')
-let CateID = ref<number>(0)
+let CateID = ref<number>()
 // 
 let drawer = ref<boolean>(false)
 //分类

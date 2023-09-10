@@ -87,8 +87,8 @@ import Echarts from './components/echarts.vue';
     display: flex;
 
     .avatar {
-        width: 100px;
-        height: 100px;
+        width: 60px;
+        height: 60px;
         border-radius: 50%;
     }
 

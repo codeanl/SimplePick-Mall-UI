@@ -14,13 +14,13 @@ const option = reactive({
     },
     yAxis: {},
     series: {
-        data: [220, 100, 350, 280, 170, 310, 30],
+        data: [400, 100, 350, 280, 170, 310, 30],
         type: "bar",
     },
 });
 
 const updateData = () => {
-    option.series.data = [120, 10, 50, 380, 70, 210, 230]; //可以
+    option.series.data = [120, 10, 50, 380, 70, 210, 400]; //可以
 
     // option.series = {
     //   data: [120, 10, 50, 380, 70, 210, 230],

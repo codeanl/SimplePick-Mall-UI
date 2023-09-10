@@ -38,18 +38,11 @@
             </el-table-column>
             <el-table-column label="名称" align="center" prop="name" show-overflow-tooltip></el-table-column>
             <el-table-column label="链接" align="center" prop="url" show-overflow-tooltip></el-table-column>
-            <el-table-column label="状态" align="center" prop="status" show-overflow-tooltip>
+            <el-table-column label="状态" align="center" prop="status" show-overflow-tooltip width="60px">
                 <template #="{ row }">
-                    <template v-if="row.status === '0'">
-                        <el-tag key="item.label" class="mx-1" type="danger" effect="light">
-                            不显示
-                        </el-tag>
-                    </template>
-                    <template v-if="row.status === '1'">
-                        <el-tag key="item.label" class="mx-1" type="success" effect="light">
-                            显示
-                        </el-tag>
-                    </template>
+                    <el-switch v-model="row.status" class="ml-2"
+                        style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" active-value="1"
+                        inactive-value="0" @change="handleChange(row)" />
                 </template>
             </el-table-column>
             <el-table-column label="备注" align="center" prop="note" show-overflow-tooltip></el-table-column>
@@ -291,6 +284,17 @@ const deleteSelect = async () => {
     if (res.code === 200) {
         ElMessage({ type: 'success', message: '删除成功' })
         getHas(listArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
+    }
+}
+//状态修改用户
+let handleChange = async (row: any) => {
+    let data: any = {
+        id: row.id as number,
+        status: row.status
+    }
+    let res = await reqAddOrUpdate(data)
+    if (res.code === 200) {
+        ElMessage({ type: 'success', message: '修改状态成功' })
     }
 }
 </script>

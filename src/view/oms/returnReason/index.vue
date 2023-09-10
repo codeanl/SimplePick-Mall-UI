@@ -34,16 +34,9 @@
             <el-table-column label="名称" align="center" prop="name" show-overflow-tooltip></el-table-column>
             <el-table-column label="状态" align="center" prop="status" show-overflow-tooltip>
                 <template #="{ row }">
-                    <template v-if="row.status === '0'">
-                        <el-tag key="item.label" class="mx-1" type="danger" effect="light">
-                            禁用
-                        </el-tag>
-                    </template>
-                    <template v-if="row.status === '1'">
-                        <el-tag key="item.label" class="mx-1" type="success" effect="light">
-                            正常
-                        </el-tag>
-                    </template>
+                    <el-switch v-model="row.status" class="ml-2"
+                        style="--el-switch-on-color: #13ce66; --el-switch-off-color: #5597ce" active-value="1"
+                        inactive-value="0" @change="handleChange(row)" />
                 </template>
             </el-table-column>
             <el-table-column label="操作" width="300px" align="center">
@@ -221,6 +214,18 @@ const save = async () => {
             type: 'error',
             message: Params.id ? '更新失败' : '添加失败',
         })
+    }
+}
+
+//状态修改用户
+let handleChange = async (row: any) => {
+    let data: any = {
+        id: row.id as number,
+        status: row.status
+    }
+    let res = await reqAddOrUpdatereturnReason(data)
+    if (res.code === 200) {
+        ElMessage({ type: 'success', message: '修改状态成功' })
     }
 }
 </script>

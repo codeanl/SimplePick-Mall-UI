@@ -1,4 +1,4 @@
-//获取时间段 上午下午。。。
+//获取时间段 上午下午
 export const getTime = () => {
     let msg = ''
     let h = new Date().getHours()

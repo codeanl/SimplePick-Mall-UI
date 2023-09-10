@@ -20,7 +20,6 @@ let LayoutSettingStore = useLayoutSettingStore()
     padding: 10px;
 
     img {
-        height: 40px;
         width: 40px;
     }
 
