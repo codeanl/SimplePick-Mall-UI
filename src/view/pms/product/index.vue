@@ -106,6 +106,7 @@
         </el-form>
         <!-- 照片墙 -->
         <el-form :model="Params" :inline="true">
+            <h2>照片墙</h2>
             <el-upload v-model:file-list="fileList" action="/api/api/sys/upload" list-type="picture-card"
                 :on-preview="handlePictureCardPreview" :on-remove="handleRemove" :on-success="handleAvatarSuccess1">
                 <el-icon>
@@ -116,9 +117,24 @@
                 <img w-full :src="dialogImageUrl" alt="Preview Image" />
             </el-dialog>
         </el-form>
+
+        <!-- 介绍照片墙 -->
+        <el-form :model="Params" :inline="true">
+            <h2>介绍照片墙</h2>
+            <el-upload v-model:file-list="introduceimgList" action="/api/api/sys/upload" list-type="picture-card"
+                :on-preview="handlePictureCardPreview1" :on-remove="handleRemove1" :on-success="handleAvatarSuccess2">
+                <el-icon>
+                    <Plus />
+                </el-icon>
+            </el-upload>
+            <el-dialog v-model="dialogVisible1">
+                <img w-full :src="dialogImageUrl1" alt="Preview Image" />
+            </el-dialog>
+        </el-form>
         <!--  -->
         <!-- ---------------------------------------- -->
         <el-form :model="Params" :inline="true">
+            <h2>属性</h2>
             <el-form-item prop="attrList" v-for="(attribute, index) in Params.attributeType1" :key="index"
                 :label="attribute.name">
                 <el-select v-model="selectedValue[index]" placeholder="请选择">
@@ -130,6 +146,7 @@
 
         <!--  -->
         <el-form :model="Params" :inline="true">
+            <h2>规格（修改时如果不修改sku无需填写）</h2>
             <el-checkbox-group v-model="selectedValue1[index]" v-for="(attribute, index) in Params.attributeType2"
                 :label="attribute.name">
                 <el-checkbox v-for="(valueObj, valueIndex) in convertToArray(attribute.value)" :label="valueObj"
@@ -245,6 +262,7 @@ const Params = reactive<any>({
     size: [{ name: '', sizeValue: [] }],
     sizeList: [],
     imgUrl: [],
+    introduceImgUrl: [],
     attributeType1: [],
     attributeType2: [],
     attributeValueList: [],
@@ -348,11 +366,13 @@ const cancel = () => {
 }
 
 const fileList = ref<UploadUserFile[]>([])
+const introduceimgList = ref<UploadUserFile[]>([])
 //添加用户按钮
 const add = () => {
     drawer.value = true
     //存储收集已有的账号信息
     fileList.value = []
+    introduceimgList.value = []
     // 清空Params对象
     Object.keys(Params).forEach(key => {
         Params[key] = Array.isArray(Params[key]) ? [] : '';
@@ -388,10 +408,15 @@ const update = async (row: any) => {
             attributeValue: res.data.attributeValue,
             sizeList: res.data.sizeList,
             imgUrl: res.data.imgUrl,
+            introduceimgList: res.data.introduceImgUrl,
             attributeCategoryID: res.data.productInfo.attributeCategoryID,
         })
         fetchAttributeList(res.data.productInfo.attributeCategoryID)
         fileList.value = Params.imgUrl.map((url: string) => ({
+            name: url.substring(url.lastIndexOf('/') + 1),
+            url: url
+        }));
+        introduceimgList.value = Params.introduceimgList.map((url: string) => ({
             name: url.substring(url.lastIndexOf('/') + 1),
             url: url
         }));
@@ -449,14 +474,23 @@ const save = async () => {
 
 
 const dialogImageUrl = ref('')
+const dialogImageUrl1 = ref('')
 const dialogVisible = ref(false)
+const dialogVisible1 = ref(false)
 const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
     dialogImageUrl.value = uploadFile.url!
     dialogVisible.value = true
 }
+const handlePictureCardPreview1: UploadProps['onPreview'] = (uploadFile) => {
+    dialogImageUrl1.value = uploadFile.url!
+    dialogVisible1.value = true
+}
 const handleRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
     console.log(uploadFile, uploadFiles)
     Params.imgUrl = Params.imgUrl.filter((item: string | undefined) => item !== uploadFile.url);
+}
+const handleRemove1: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
+    Params.introduceImgUrl = Params.introduceImgUrl.filter((item: string | undefined) => item !== uploadFile.url);
 }
 //图片上传
 import type { UploadProps } from 'element-plus'
@@ -474,6 +508,11 @@ const handleAvatarSuccess1: UploadProps['onSuccess'] = (response) => {
     //上传返回的数据 图片url  uploadFile
     Params.imgUrl.push(response.data)
     Params.imgUrl.value.clearValidate('imgUrl')
+}
+const handleAvatarSuccess2: UploadProps['onSuccess'] = (response) => {
+    //上传返回的数据 图片url  uploadFile
+    Params.introduceImgUrl.push(response.data)
+    Params.introduceImgUrl.value.clearValidate('introduceImgUrl')
 }
 //上传图片之前出发的钩子函数
 const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
@@ -562,7 +601,12 @@ const search = () => {
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+h2 {
+    font-size: 16px;
+    padding: 20px;
+}
+</style>
 <style>
 .avatar-uploader .avatar {
     width: 178px;

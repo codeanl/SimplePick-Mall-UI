@@ -55,12 +55,6 @@
                     </template>
                 </template>
             </el-table-column>
-            <el-table-column label="地址" align="center" show-overflow-tooltip>
-                <template #="{ row }">
-                    <span>{{ row.receiverProvince + row.receiverCity + row.receiverRegion + row.receiverDetailAddress
-                    }}</span>
-                </template>
-            </el-table-column>
             <el-table-column label="用户信息" align="center" show-overflow-tooltip>
                 <template #="{ row }">
                     <span>{{ row.receiverName + row.receiverPhone
@@ -196,6 +190,7 @@
                 </el-tag>
             </el-descriptions-item>
             <el-descriptions-item label="备注">{{ orderInfo?.note }}</el-descriptions-item>
+            <el-descriptions-item label="支付时间">{{ orderInfo?.paymentTime }}</el-descriptions-item>
             <el-descriptions-item label="发货时间">{{ orderInfo?.deliveryTime }}</el-descriptions-item>
             <el-descriptions-item label="确认收货时间">{{ orderInfo?.receiveTime }}</el-descriptions-item>
             <el-descriptions-item label="评论时间">{{ orderInfo?.commentTime }}</el-descriptions-item>
@@ -205,8 +200,6 @@
             style="margin: 40px 0 0 20px;">
             <el-descriptions-item label="收货人">{{ orderInfo?.receiverName }}</el-descriptions-item>
             <el-descriptions-item label="联系电话">{{ orderInfo?.receiverPhone }}</el-descriptions-item>
-            <el-descriptions-item label="地址">{{ orderInfo?.receiverProvince
-            }}{{ orderInfo?.receiverCity }}{{ orderInfo?.receiverRegion }}</el-descriptions-item>
         </el-descriptions>
         <el-descriptions title="自提点信息" direction="horizontal" :column="1" :size="size" border
             style="margin: 40px 0 0 20px;">
