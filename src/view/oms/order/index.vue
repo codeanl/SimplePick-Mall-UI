@@ -9,9 +9,20 @@
             <el-form-item label="用户名:">
                 <el-input placeholder="请输入搜索的用户名" v-model="memberUsername"></el-input>
             </el-form-item>
+            <el-form-item label="状态:">
+                <el-select v-model="status" class="m-2" placeholder="请选择状态">
+                    <!--  0->待付款；1->待发货；2->已发货；3->确认收货；4->订单完成(完成评价)；5->无效订单' -->
+                    <el-option label="待付款" value="0" />
+                    <el-option label="待发货" value="1" />
+                    <el-option label="已发货" value="2" />
+                    <el-option label="确认收货" value="3" />
+                    <el-option label="订单完成" value="4" />
+                    <el-option label="无效订单" value="5" />
+                </el-select>
+            </el-form-item>
             <el-form-item>
                 <el-button type="primary" size="default" @click="search"
-                    :disabled="orderSn.length || memberUsername.length ? false : true">
+                    :disabled="orderSn.length || memberUsername.length || status.length ? false : true">
                     搜索
                 </el-button>
                 <el-button size="default" @click="reset">重置</el-button>
@@ -25,7 +36,6 @@
             <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
             <el-table-column label="订单号" align="center" prop="orderSn" show-overflow-tooltip></el-table-column>
             <el-table-column label="用户名" align="center" prop="memberUserName" show-overflow-tooltip></el-table-column>
-
             <el-table-column label="支付方式" align="center" prop="payType" show-overflow-tooltip>
                 <template #="{ row }">
                     <template v-if="row.payType === '1'">
@@ -40,7 +50,6 @@
                     </template>
                 </template>
             </el-table-column>
-
             <el-table-column label="订单类型" align="center" prop="orderType" show-overflow-tooltip>
                 <template #="{ row }">
                     <template v-if="row.orderType === '1'">
@@ -235,6 +244,7 @@ const placeInfo = ref<any>(null)
 //收集用户查找的关键字
 let orderSn = ref<string>('')
 let memberUsername = ref<string>('')
+let status = ref<string>('')
 //定义响应式数据 抽屉的显示隐藏
 //定义响应式数据 抽屉的显示隐藏
 let drawer = ref<boolean>(false)
@@ -250,6 +260,7 @@ const getHas = async (pager = 1) => {
         pageSize.value,
         orderSn.value,
         memberUsername.value,
+        status.value
     )
     if (res.code == 200) {
         total.value = res.total

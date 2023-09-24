@@ -69,7 +69,7 @@
             @size-change="handler" />
     </el-card>
     <!-- 抽屉  完成 添加｜修改 的窗口 -->
-    <el-dialog v-model="drawer" title="更新自提点">
+    <el-dialog v-model="drawer" title="更新">
         <el-form :model="Params" ref="formRef">
             <el-form-item label="排序" prop="sort">
                 <el-input placeholder="请您输入排序" v-model="Params.sort"></el-input>

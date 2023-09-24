@@ -3,63 +3,58 @@
     <el-card>
         <el-form :inline="true" class="form">
             <el-form-item label="名称:">
-                <el-input placeholder="请输入搜索的用户名" v-model="name"></el-input>
-            </el-form-item>
-            <el-form-item label="地址:">
-                <el-input placeholder="请输入搜索的用户名" v-model="place"></el-input>
-            </el-form-item>
-            <el-form-item label="手机号:">
-                <el-input placeholder="请输入搜索的用户名" v-model="phone"></el-input>
+                <el-input placeholder="请输入搜索的名称" v-model="name"></el-input>
             </el-form-item>
             <el-form-item label="负责人:">
-                <el-input placeholder="请输入搜索的负责人" v-model="principal"></el-input>
+                <el-input placeholder="请输入搜索的名称" v-model="principal"></el-input>
+            </el-form-item>
+            <el-form-item label="地址:">
+                <el-input placeholder="请输入搜索的名称" v-model="address"></el-input>
+            </el-form-item>
+            <el-form-item label="联系电话:">
+                <el-input placeholder="请输入搜索的名称" v-model="phone"></el-input>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" size="default" @click="search"
-                    :disabled="name.length || place.length || phone.length || principal.length ? false : true">
+                    :disabled="name || principal || address || phone ? false : true">
                     搜索
                 </el-button>
                 <el-button size="default" @click="reset">重置</el-button>
             </el-form-item>
         </el-form>
     </el-card>
-    <!--  -->
+    <!-- 数据展示 -->
     <el-card>
+        <!-- 上边按钮 -->
         <el-button type="success" size="default" @click="add">
-            添加自提点
+            添加
         </el-button>
         <el-button type="danger" size="default" @click="deleteSelect" :disabled="selectIdArr.length ? false : true">
             批量删除
         </el-button>
         <el-badge v-if="total1 != 0" :value="total1" :max="10" class="item" style="margin-left: 10px;">
-            <el-button type="primary" size="default" icon="Edit" @click="look">查看审核</el-button>
+            <el-button type="primary" size="default" icon="Edit" @click="look">审核</el-button>
         </el-badge>
-        <el-button v-else type="primary" size="default" icon="Edit" @click="look">查看审核</el-button>
-        <el-table border :data="listArr" @selection-change="selectChange" style="margin-top: 15px;">
+        <el-button v-else type="primary" size="default" icon="Edit" @click="look">审核</el-button>
+        <!-- 数据 -->
+        <el-table border :data="listArr" @selection-change="selectChange" style="margin: 15px 0">
             <el-table-column type="selection" align="center" width="30px"></el-table-column>
             <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
-            <el-table-column label="门店图片" align="center" prop="pic" show-overflow-tooltip width="120px">
+            <el-table-column label="店铺图片" align="center" prop="pic" show-overflow-tooltip width="120px">
                 <template #="{ row }">
-                    <img :src="row.pic" alt="头像" style="width: 100px; height: auto;" />
+                    <img :src="row.pic" alt="店铺图片" style="width: 100px; height: auto;" />
                 </template>
             </el-table-column>
             <el-table-column label="名称" align="center" prop="name" show-overflow-tooltip></el-table-column>
-            <el-table-column label="联系方式" align="center" prop="phone" show-overflow-tooltip></el-table-column>
-            <el-table-column label="详细地址" align="center" prop="place" show-overflow-tooltip></el-table-column>
-            <el-table-column label="状态" align="center" prop="status" show-overflow-tooltip width="60px">
-                <template #="{ row }">
-                    <el-switch v-model="row.status" class="ml-2"
-                        style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" active-value="1"
-                        inactive-value="0" @change="handleChange(row)" />
-                </template>
-            </el-table-column>
             <el-table-column label="负责人" align="center" prop="principal" show-overflow-tooltip></el-table-column>
+            <el-table-column label="联系电话" align="center" prop="phone" show-overflow-tooltip></el-table-column>
+            <el-table-column label="地址" align="center" prop="address" show-overflow-tooltip></el-table-column>
             <el-table-column label="操作" width="300px" align="center">
                 <template #="{ row }">
                     <el-button type="primary" size="small" icon="Edit" @click="update(row)">
                         编辑
                     </el-button>
-                    <el-popconfirm :title="`你确定删除${row.username}`" width="260px" @confirm="deletePlace(row.id)">
+                    <el-popconfirm :title="`你确定删除${row.name}`" width="260px" @confirm="deleteproduct(row.id)">
                         <template #reference>
                             <el-button type="danger" size="small" icon="Delete">
                                 删除
@@ -71,32 +66,26 @@
         </el-table>
         <!-- 分页 -->
         <el-pagination v-model:current-page="pageNo" v-model:page-size="pageSize" :page-sizes="[5, 10, 15, 20]"
-            :background="true" layout="prev, pager, next, jumper, -> , sizes, total" :total="total"
-            @current-change="getHasPlace" @size-change="handler" />
+            :background="true" layout="prev, pager, next, jumper, -> , sizes, total" :total="total" @current-change="getHas"
+            @size-change="handler" />
     </el-card>
     <!--  -->
-    <!-- 抽屉  完成 添加｜修改 的窗口 -->
-    <el-dialog v-model="drawer" :title="Params.id ? '更新自提点' : '添加自提点'">
+    <el-dialog v-model="drawer" :title="Params.id ? '更新' : '添加'" width="70%">
+
         <el-form :model="Params" ref="formRef">
             <el-form-item label="名称" prop="name">
                 <el-input placeholder="请您输入名称" v-model="Params.name"></el-input>
             </el-form-item>
-            <el-form-item label="联系方式" prop="place">
-                <el-input placeholder="请您输入联系方式" v-model="Params.place"></el-input>
-            </el-form-item>
-            <el-form-item label="详细地址" prop="phone">
-                <el-input placeholder="请您输入详细地址" v-model="Params.phone"></el-input>
-            </el-form-item>
-            <el-form-item label="状态" prop="status">
-                <el-select v-model="Params.status" class="m-2" placeholder="请选择性别">
-                    <el-option label="暂停营业" value="0" />
-                    <el-option label="营业中" value="1" />
-                </el-select>
-            </el-form-item>
             <el-form-item label="负责人" prop="principal">
                 <el-input placeholder="请您输入负责人" v-model="Params.principal"></el-input>
             </el-form-item>
-            <el-form-item label="门店图片" prop="pic">
+            <el-form-item label="联系电话" prop="phone">
+                <el-input placeholder="联系电话" v-model="Params.phone"></el-input>
+            </el-form-item>
+            <el-form-item label="地址" prop="address">
+                <el-input placeholder="地址" v-model="Params.address"></el-input>
+            </el-form-item>
+            <el-form-item label="商品封面" prop="pic">
                 <el-upload class="avatar-uploader" action="/api/api/sys/upload" :show-file-list="false"
                     :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
                     <img v-if="Params.pic" :src="Params.pic" class="avatar" />
@@ -113,7 +102,6 @@
             </div>
         </template>
     </el-dialog>
-
     <!--  -->
     <el-dialog v-model="drawer1" width="70%">
         <el-select v-model="applyStatus" class="m-2" placeholder="请选择状态" @change="applyStatusChange">
@@ -123,6 +111,7 @@
         </el-select>
         <!-- 数据 -->
         <el-table border :data="listArr1" @selection-change="selectChange">
+            <el-table-column type="selection" align="center" width="30px"></el-table-column>
             <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
             <el-table-column label="店铺图片" align="center" prop="pic" show-overflow-tooltip width="120px">
                 <template #="{ row }">
@@ -173,68 +162,41 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive, nextTick } from 'vue'
-import { reqPlaceList, reqRemovePlace, reqAddOrUpdate } from '@/api/sys/place'
-import { reqAllMerchantApply, reqAddOrUpdateMerchantApply } from '@/api/pms/merchantApply'
-import { ElMessage } from 'element-plus';
-
-//setting仓库
-import useLayoutSettingStore from '@/store/setting'
-let settingStore = useLayoutSettingStore()
-
-
-//默认页码
+import { ref, onMounted, reactive } from 'vue'
+import { reqAll, reqAddOrUpdate, reqRemove } from '@/api/pms/merchant'
+import { reqAllMerchantApply, reqAddOrUpdateMerchantApply, reqRemoveMerchantApply } from '@/api/pms/merchantApply'
+const input = ref('')
+//分页数据
 let pageNo = ref<number>(1)
-//默认个数
 let pageSize = ref<number>(10)
 let total = ref<number>(0)
 let pageNo1 = ref<number>(1)
 let pageSize1 = ref<number>(5)
 let total1 = ref<number>(0)
-//数据列表
-let listArr = ref<any>([])
-//收集用户查找的关键字
-let name = ref<string>('')
-let place = ref<string>('')
-let phone = ref<string>('')
-let principal = ref<string>('')
-//收集删除的id
-let ids = ref<number[]>([])
-//多选框选择的id
-let selectIdArr = ref<any[]>([])
-//复选框选择
-const selectChange = (value: any) => {
-    selectIdArr.value = value
-}
-const size = ref('')
-//组件实例
-let formRef = ref<any>()
-//定义响应式数据 抽屉的显示隐藏
-let drawer = ref<boolean>(false)
-let drawer1 = ref<boolean>(false)
-let drawer2 = ref<boolean>(false)
-let Params = reactive<any>({
+const Params = reactive<any>({
+    id: 0,
     name: '',
-    place: '',
-    status: '',
-    pic: '',
-    phone: '',
     principal: '',
+    phone: '',
+    address: '',
+    pic: '',
 })
-//组件挂载完毕
-onMounted(() => {
-    getHasPlace()
-    getHas1()
-})
+//数据
+let name = ref<string>('')
+let principal = ref<string>('')
+let address = ref<string>('')
+let phone = ref<string>('')
+let name1 = ref<string>('')
+const size = ref('')
 //获取信息
-const getHasPlace = async (pager = 1) => {
+const getHas = async (pager = 1) => {
     pageNo.value = pager
-    let res: any = await reqPlaceList(
+    let res: any = await reqAll(
         pageNo.value,
         pageSize.value,
         name.value,
-        place.value,
         phone.value,
+        address.value,
         principal.value
     )
     if (res.code == 200) {
@@ -242,28 +204,54 @@ const getHasPlace = async (pager = 1) => {
         listArr.value = res.data
     }
 }
+let applyStatus = ref<string>('0')
+const getHas1 = async (pager = 1) => {
+    pageNo1.value = pager
+    let res: any = await reqAllMerchantApply(
+        pageNo1.value,
+        pageSize1.value,
+        name1.value,
+        applyStatus.value,
+        '0',
+    )
+    if (res.code == 200) {
+        total1.value = res.total
+        listArr1.value = res.data
+    }
+}
+onMounted(() => {
+    getHas()
+    getHas1()
+})
+//数据列表
+let listArr = ref<any>([])
+let listArr1 = ref<any>([])
+//组件实例
+let formRef = ref<any>()
 //下拉改变
 const handler = () => {
-    getHasPlace()
+    getHas()
 }
 const handler1 = () => {
     getHas1()
 }
-//搜索按钮
-const search = () => {
-    getHasPlace()
-    name.value = ''
-    place.value = ''
-    phone.value = ''
+//多选框选择的id
+let selectIdArr = ref<any[]>([])
+//复选框选择
+const selectChange = (value: any) => {
+    selectIdArr.value = value
 }
+
+//收集删除的id
+let ids = ref<number[]>([])
 // 删除按钮
-const deletePlace = async (id: number) => {
+const deleteproduct = async (id: number) => {
     ids.value.push(id);
     const requestData: any = { ids: ids.value };
-    let res: any = await reqRemovePlace(requestData);
+    let res: any = await reqRemove(requestData);
     if (res.code == 200) {
         ElMessage({ type: 'success', message: '删除成功' })
-        getHasPlace(listArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
+        getHas(listArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
     }
 }
 //批量删除用户按钮
@@ -272,75 +260,35 @@ const deleteSelect = async () => {
         return item.id
     })
     const requestData: any = { ids: ids.value };
-    let res: any = await reqRemovePlace(requestData);
+    let res: any = await reqRemove(requestData);
     if (res.code === 200) {
         ElMessage({ type: 'success', message: '删除成功' })
-        getHasPlace(listArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
+        getHas(listArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
     }
-}
-//重置按钮
-const reset = () => {
-    settingStore.refresh = !settingStore.refresh
-}
-//取消按钮
-const cancel = () => {
-    drawer.value = false
-}
-// 编辑按钮
-const update = (row: any) => {
-    drawer.value = true
-    Object.assign(Params, row)
-    nextTick(() => {
-        formRef.value.clearValidate('name')
-        formRef.value.clearValidate('place')
-        formRef.value.clearValidate('status')
-        formRef.value.clearValidate('pic')
-        formRef.value.clearValidate('phone')
-        formRef.value.clearValidate('principal')
-    })
-}
-//添加用户按钮
-const add = () => {
-    drawer.value = true
-    //存储收集已有的账号信息
-    Object.assign(Params, {
-        id: 0,
-        name: '',
-        place: '',
-        status: '',
-        pic: '',
-        phone: '',
-        principal: '',
-    })
-    nextTick(() => {
-        formRef.value.clearValidate('name')
-        formRef.value.clearValidate('place')
-        formRef.value.clearValidate('status')
-        formRef.value.clearValidate('pic')
-        formRef.value.clearValidate('phone')
-        formRef.value.clearValidate('principal')
-    })
 }
 
-//窗口保存按钮
-const save = async () => {
-    let res: any = await reqAddOrUpdate(Params)
-    if (res.code == 200) {
-        drawer.value = false
-        ElMessage({
-            type: 'success',
-            message: Params.id ? '更新成功' : '添加成功',
-        })
-        // window.location.reload()
-        getHasPlace()
-    } else {
-        drawer.value = false
-        ElMessage({
-            type: 'error',
-            message: Params.id ? '更新失败' : '添加失败',
-        })
-    }
+//定义响应式数据 抽屉的显示隐藏
+let drawer = ref<boolean>(false)
+let drawer1 = ref<boolean>(false)
+let drawer2 = ref<boolean>(false)
+//添加按钮
+const add = () => {
+    drawer.value = true
+    // 清空Params对象
+    Object.keys(Params).forEach(key => {
+        Params[key] = Array.isArray(Params[key]) ? [] : '';
+    });
 }
+
+// 编辑按钮
+const update = async (row: any) => {
+    drawer.value = true
+    Object.keys(Params).forEach(key => {
+        Params[key] = Array.isArray(Params[key]) ? [] : '';
+    });
+    Object.assign(Params, row)
+}
+
 import type { UploadProps } from 'element-plus'
 //图片上传成功的钩子
 const handleAvatarSuccess: UploadProps['onSuccess'] = (response) => {
@@ -372,50 +320,52 @@ const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
     }
 }
 
-//状态修改用户
-let handleChange = async (row: any) => {
-    let data: any = {
-        id: row.id as number,
-        status: row.status
-    }
-    let res = await reqAddOrUpdate(data)
-    if (res.code === 200) {
-        ElMessage({ type: 'success', message: '修改状态成功' })
-    }
+//取消按钮
+const cancel = () => {
+    drawer.value = false
 }
-
-let applyStatusChange = () => {
-    console.log(applyStatus.value);
-    getHas1()
-}
-let listArr1 = ref<any>([])
-let applyStatus = ref<string>('0')
-let name1 = ref<string>('')
-const getHas1 = async (pager = 1) => {
-    pageNo1.value = pager
-    let res: any = await reqAllMerchantApply(
-        pageNo1.value,
-        pageSize1.value,
-        name1.value,
-        applyStatus.value,
-        '1',
-    )
+const save = async () => {
+    let res: any = await reqAddOrUpdate(Params)
     if (res.code == 200) {
-        total1.value = res.total
-        listArr1.value = res.data
+        drawer.value = false
+        ElMessage({
+            type: 'success',
+            message: Params.id ? '更新成功' : '添加成功',
+        })
+        getHas()
+    } else {
+        ElMessage({
+            type: 'error',
+            message: Params.id ? '更新失败' : '添加失败',
+        })
     }
 }
-
+import useLayoutSettingStore from '@/store/setting'
+let settingStore = useLayoutSettingStore()
+//重置按钮
+const reset = () => {
+    settingStore.refresh = !settingStore.refresh
+}
+//搜索按钮
+const search = () => {
+    getHas()
+    name.value = ''
+}
 //查看审核
 let look = () => {
     drawer1.value = true
 }
-const input = ref('')
+
 let merchantsApply = ref<any>()
 let lookInfo = (row: any) => {
     input.value = ''
     drawer2.value = true
     merchantsApply.value = row
+}
+
+let applyStatusChange = () => {
+    console.log(applyStatus.value);
+    getHas1()
 }
 
 let getCurrentDateTime = () => {
@@ -471,30 +421,27 @@ let ok = async () => {
         if (res2.code == 200) {
             drawer2.value = false
             getHas1()
-            getHasPlace()
+            getHas()
             await reqAddOrUpdateUser({
                 id: res2.data,
-                roleId: [5],
+                roleId: [6],
                 dataType: '1',
             })
             await reqAddOrUpdate({
                 name: merchantsApply.value.name,
                 principal: merchantsApply.value.principalName,
                 phone: merchantsApply.value.principalPhone,
-                place: merchantsApply.value.address,
+                address: merchantsApply.value.address,
                 pic: merchantsApply.value.pic,
                 userID: res2.data,
-                status: '1',
             })
-            getHas1()
-            getHasPlace()
         }
 
     }
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped></style>
 <style>
 .avatar-uploader .avatar {
     width: 178px;

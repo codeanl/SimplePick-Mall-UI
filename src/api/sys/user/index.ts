@@ -13,8 +13,8 @@ enum API {
     resetPassword_url = '/api/sys/user/restartPassword'
 }
 
-export const reqUserInfo = (current: number, pageSize: number, username: string, phone: string, nickname: string, status: string, gender: string) =>
-    request.get<any, any>(API.ALLUSER_URL, { params: { current, pageSize, username, phone, nickname, status, gender } });
+export const reqUserInfo = (current: number, pageSize: number, username: string, phone: string, nickname: string, status: string, gender: string, email: string) =>
+    request.get<any, any>(API.ALLUSER_URL, { params: { current, pageSize, username, phone, nickname, status, gender, email } });
 
 export const reqAddOrUpdateUser = (data: any) => {
     if (data.id) {

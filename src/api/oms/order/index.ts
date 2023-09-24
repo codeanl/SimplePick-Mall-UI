@@ -6,8 +6,8 @@ enum API {
     DELETEALLOrder_URL = '/api/oms/order/delete',
     OrderInfo = '/api/oms/order/info',
 }
-export const reqOrderAll = (current: number, pageSize: number, orderSn: string, memberUsername: string) =>
-    request.get<any, any>(API.ALLOrder_URL, { params: { current, pageSize, orderSn, memberUsername } });
+export const reqOrderAll = (current: number, pageSize: number, orderSn: string, memberUsername: string, status: string) =>
+    request.get<any, any>(API.ALLOrder_URL, { params: { current, pageSize, orderSn, memberUsername, status } });
 
 export const reqAddOrUpdateOrder = (data: any) => {
     if (data.id) {

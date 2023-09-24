@@ -74,7 +74,15 @@ export const constantRoute = [
             },
         ],
     },
-
+    {
+        path: '/merchantApply',
+        component: () => import('@/view/pms/merchantApply/index.vue'),
+        name: '商家入驻',
+        meta: {
+            title: 'merchantApply',
+            hidden: true,
+        },
+    },
 ]
 
 export const asyncRoute = [
@@ -148,6 +156,16 @@ export const asyncRoute = [
                 name: 'Category',
                 meta: {
                     title: '分类管理',
+                    icon: 'Management',
+                    hidden: false,
+                },
+            },
+            {
+                path: '/pms/merchant',
+                component: () => import('@/view/pms/merchant/index.vue'),
+                name: 'Merchant',
+                meta: {
+                    title: '商家管理',
                     icon: 'Management',
                     hidden: false,
                 },

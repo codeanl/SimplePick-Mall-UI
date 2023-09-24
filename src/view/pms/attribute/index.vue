@@ -1,11 +1,11 @@
 <template>
     <!-- 上边搜索 -->
-    <el-card style="height: 80px">
+    <el-card>
         <el-form :inline="true" class="form">
             <el-form-item label="用户名:">
                 <el-input placeholder="请输入搜索的用户名" v-model="name"></el-input>
             </el-form-item>
-            <el-form-item label="用户名:">
+            <el-form-item label="所属属性:">
                 <el-tree-select v-model="CateID" :data="CateListArr" check-strictly
                     :props="{ key: 'categoryId', label: 'name' }" node-key="id" :render-after-expand="false" />
             </el-form-item>
@@ -25,10 +25,10 @@
         </el-form>
     </el-card>
     <!--  -->
-    <el-card style="margin:10px 0">
+    <el-card>
         <!-- 展示数据列表 -->
-        <el-button type="primary" size="default" icon="Plus" @click="add">添加属性</el-button>
-        <el-table border style="margin:10px 0" :data="ListArr">
+        <el-button type="primary" size="default" icon="Plus" @click="add">添加</el-button>
+        <el-table border style="margin:15px 0" :data="ListArr">
             <el-table-column label="编号" width="70px" align="center" prop="id"></el-table-column>
             <el-table-column label="属性名称" align="center" prop="name"></el-table-column>
             <el-table-column label="类型" align="center" prop="type">
@@ -61,7 +61,7 @@
     </el-card>
     <!--  -->
     <el-dialog v-model="drawer">
-        <el-form :inline="true">
+        <el-form>
             <el-form-item label="所属分类">
                 <el-tree-select v-model="Params.attributeCategoryID" :data="CateListArr" check-strictly
                     :props="{ key: 'attributeCategoryID', label: 'name' }" node-key="id" :render-after-expand="false" />
@@ -73,7 +73,8 @@
                 <el-input placeholder="请输入属性值" v-model="Params.value"></el-input>
             </el-form-item>
             <el-form-item label="排序">
-                <el-input placeholder="请输入排序" v-model="Params.sort"></el-input>
+                <!-- <el-input placeholder="请输入排序" v-model="Params.sort"></el-input> -->
+                该菜单排在第<el-input-number v-model="Params.sort" :min="1" size="small" controls-position="right" />位
             </el-form-item>
             <el-form-item label="类型">
                 <el-select v-model="Params.type" class="m-2" placeholder="请选择类型">
@@ -82,7 +83,6 @@
                 </el-select>
             </el-form-item>
         </el-form>
-
         <el-button type="primary" size="default" @click="save">保存</el-button>
         <el-button type="primary" size="default" @click="cancel">取消</el-button>
     </el-dialog>

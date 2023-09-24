@@ -1,4 +1,24 @@
 <template>
+    <!--  上边搜索 -->
+    <el-card style="height: 80px">
+        <el-form :inline="true" class="form">
+            <el-form-item label="状态:">
+                <el-select v-model="status" class="m-2" placeholder="请选择状态">
+                    <!-- ：0->待处理；1->退货中；2->已完成；3->已拒绝' -->
+                    <el-option label="待处理" value="0" />
+                    <el-option label="退货中" value="1" />
+                    <el-option label="已完成" value="2" />
+                    <el-option label="已拒绝" value="3" />
+                </el-select>
+            </el-form-item>
+            <el-form-item>
+                <el-button type="primary" size="default" @click="search" :disabled="status.length ? false : true">
+                    搜索
+                </el-button>
+                <el-button size="default" @click="reset">重置</el-button>
+            </el-form-item>
+        </el-form>
+    </el-card>
     <!--  -->
     <el-card style="margin: 10px 0">
         <el-table border :data="listArr" @selection-change="selectChange">
@@ -76,10 +96,6 @@
             <el-descriptions-item label="用户账号">{{ orderInfo.user.username }}</el-descriptions-item>
             <el-descriptions-item label="联系人">{{ orderInfo.order.orderInfo.receiverName }}</el-descriptions-item>
             <el-descriptions-item label="联系电话">{{ orderInfo.order.orderInfo.receiverPhone }}</el-descriptions-item>
-            <el-descriptions-item label="收货地址">
-                {{ orderInfo.order.orderInfo.receiverProvince + orderInfo.order.orderInfo.receiverCity +
-                    orderInfo.order.orderInfo.receiverRegion + orderInfo.order.orderInfo.receiverDetailAddress }}
-            </el-descriptions-item>
             <el-descriptions-item label="退货原因">{{ orderInfo.returnReasonName }}</el-descriptions-item>
             <el-descriptions-item label="问题描述">{{ orderInfo.description }}</el-descriptions-item>
             <el-descriptions-item label="订单金额">{{ orderInfo.order.orderInfo.payAmount }}</el-descriptions-item>
@@ -119,8 +135,9 @@ let total = ref<number>(0)
 let listArr = ref<any>([])
 let skuList = ref<any>([])
 let orderInfo = ref<any>([])
-//收集用户查找的关键字
-let status = ref<string>('')
+
+let memberUsername = ref<any>('')
+let status = ref<any>('')
 //收集删除的id
 let ids = ref<number[]>([])
 //多选框选择的id
@@ -204,6 +221,17 @@ function getStatusValue(label: string): string | number {
     ];
     const option = options.find(opt => opt.label === label);
     return option ? option.value : label;
+}
+
+//搜索按钮
+const search = () => {
+    getHas()
+    status.value = ''
+    memberUsername.value = ''
+}
+//重置按钮
+const reset = () => {
+    settingStore.refresh = !settingStore.refresh
 }
 </script>
 

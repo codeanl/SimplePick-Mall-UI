@@ -23,7 +23,7 @@
     <!--  -->
     <el-card style="margin: 10px 0">
         <el-button type="success" size="default" @click="add">
-            添加用户
+            添加
         </el-button>
         <el-button type="danger" size="default" @click="deleteSelect" :disabled="selectIdArr.length ? false : true">
             批量删除
@@ -69,7 +69,7 @@
     </el-card>
     <!--  -->
     <!-- 抽屉  完成 添加｜修改 的窗口 -->
-    <el-dialog v-model="drawer" :title="Params.id ? '更新自提点' : '添加自提点'">
+    <el-dialog v-model="drawer" :title="Params.id ? '更新' : '添加'">
         <el-form :model="Params" ref="formRef">
             <el-form-item label="名称" prop="name">
                 <el-input placeholder="请您输入名称" v-model="Params.name"></el-input>

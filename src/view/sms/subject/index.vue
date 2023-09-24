@@ -21,14 +21,14 @@
     </el-card>
     <!--  -->
     <!--  -->
-    <el-card style="margin: 10px 0">
+    <el-card>
         <el-button type="success" size="default" @click="add">
-            添加用户
+            添加
         </el-button>
         <el-button type="danger" size="default" @click="deleteSelect" :disabled="selectIdArr.length ? false : true">
             批量删除
         </el-button>
-        <el-table border :data="listArr" @selection-change="selectChange">
+        <el-table border :data="listArr" @selection-change="selectChange" style="margin: 15px 0">
             <el-table-column type="selection" align="center" width="30px"></el-table-column>
             <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
             <el-table-column label="专题封面" align="center" prop="pic" show-overflow-tooltip width="120px">
@@ -104,8 +104,6 @@
             </div>
         </template>
     </el-dialog>
-
-    
 </template>
 
 <script setup lang="ts">

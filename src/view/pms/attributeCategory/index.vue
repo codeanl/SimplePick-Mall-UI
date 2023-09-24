@@ -1,10 +1,10 @@
 <template>
-    <el-card style="margin: 10px 0">
+    <el-card>
         <el-button type="success" size="default" icon="Plus" @click="add">
-            添加菜单
+            添加
         </el-button>
         <!--  -->
-        <el-table style="width: 100%; margin-bottom: 20px" row-key="id" border :data="ListArr">
+        <el-table style="margin: 10px 0" row-key="id" border :data="ListArr">
             <el-table-column prop="name" label="名称" />
             <el-table-column label="操作" width="260px">
                 <template #="{ row }">
@@ -24,7 +24,7 @@
     </el-card>
     <!--  -->
     <el-dialog v-model="dialogVisible" :title="Data.id ? '更新菜单' : '添加菜单'">
-        <el-form :inline="true" ref="formRef">
+        <el-form ref="formRef">
             <el-form-item label="名称">
                 <el-input placeholder="请你输入菜单的名称" v-model="Data.name"></el-input>
             </el-form-item>
@@ -98,7 +98,8 @@ const save = async () => {
         dialogVisible.value = false;
         ElMessage({
             type: 'success',
-            message: Data.id ? '更新成功' : '添加成功',
+            // message: Data.id ? '更新成功' : '添加成功',
+            message: res.message,
         });
         getHas();
     }
@@ -110,7 +111,11 @@ const remove = async (id: number) => {
     let res = await reqRemove(requestData);
     if (res.code == 200) {
         ids.value = [];
-        ElMessage({ type: 'success', message: '删除成功' });
+        ElMessage({
+            type: 'success',
+            //  message: '删除成功'
+            message: res.message,
+        });
         getHas();
     } else {
         ElMessage({ type: 'error', message: '删除失败' });

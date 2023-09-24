@@ -2,26 +2,26 @@
     <!--  -->
     <el-card style="height: 80px">
         <el-form :inline="true" class="form">
-            <el-form-item label="职位:">
-                <el-input placeholder="请你输入搜索职位的关键字" v-model="keyword"></el-input>
+            <el-form-item label="角色:">
+                <el-input placeholder="请你输入搜索角色名称" v-model="keyword"></el-input>
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" size="default" :disabled="keyword ? false : true" @click="search">
                     搜索
                 </el-button>
-                <el-button type="info" size="default" @click="reset">重置</el-button>
+                <el-button size="default" @click="reset">重置</el-button>
             </el-form-item>
         </el-form>
     </el-card>
     <!--  -->
-    <el-card style="margin: 10px 0">
+    <el-card>
         <el-button type="success" size="default" icon="Plus" @click="addRole">
-            添加职位
+            添加角色
         </el-button>
         <el-button type="danger" size="default" @click="deleteSelectRole" :disabled="selectIdArr.length ? false : true">
             批量删除
         </el-button>
-        <el-table border style="margin: 10px 0" :data="allRole" @selection-change="selectChange">
+        <el-table border style="margin: 15px 0" :data="allRole" @selection-change="selectChange">
             <el-table-column type="selection" align="center" width="30px"></el-table-column>
             <el-table-column label="ID" align="center" prop="id"></el-table-column>
             <el-table-column label="角色名称" align="center" show-overflow-tooltip prop="name"></el-table-column>
@@ -31,7 +31,7 @@
             <el-table-column label="更新时间" align="center" show-overflow-tooltip prop="update_at"></el-table-column>
             <el-table-column label="备注" align="center" show-overflow-tooltip prop="remark"></el-table-column>
             <el-table-column label="操作" width="280px" align="center">
-                <template #="{ row, $index }">
+                <template #="{ row }">
                     <el-button size="small" type="warning" icon="User" @click="setPermission(row)">
                         分配权限
                     </el-button>
@@ -54,13 +54,13 @@
             @current-change="getHasRole" @size-change="sizeHandler" />
     </el-card>
     <!-- 对话框 添加｜修改-->
-    <el-dialog v-model="dialogVisible" :title="RoleParams.id ? '更新职位' : '添加职位'">
+    <el-dialog v-model="dialogVisible" :title="RoleParams.id ? '更新角色' : '添加角色'">
         <el-form :model="RoleParams" :rules="rules" ref="form">
-            <el-form-item label="职位名称" prop="name">
-                <el-input placeholder="请你输入职位名称" v-model="RoleParams.name"></el-input>
+            <el-form-item label="角色名称" prop="name">
+                <el-input placeholder="请你输入角色名称" v-model="RoleParams.name"></el-input>
             </el-form-item>
             <el-form-item label="备注" prop="remark">
-                <el-input placeholder="请你输入职位名称" v-model="RoleParams.remark"></el-input>
+                <el-input placeholder="请你输入角色名称" v-model="RoleParams.remark"></el-input>
             </el-form-item>
         </el-form>
         <template #footer>
@@ -98,12 +98,12 @@ import {
     reqUpdateRoleMenu
 } from '@/api/sys/role'
 import type {
-    RoleResponseData,
     Records,
     RoleData,
-    MenuResponseData,
-    MenuList,
 } from '@/api/sys/role/type'
+
+import { ElMessage } from 'element-plus';
+
 import { ref, onMounted, reactive, nextTick } from 'vue'
 let pageNo = ref<number>(1)
 let pageSize = ref<number>(10)
@@ -175,30 +175,29 @@ const addRole = () => {
         id: 0,
     })
     nextTick(() => {
-        form.value.clearValidate('roleName')
+        form.value.clearValidate('name')
     })
 }
 //更新按钮
 const updateRole = (row: RoleData) => {
     dialogVisible.value = true
-    //存储已有的职位
+    //存储已有的角色
     Object.assign(RoleParams, row)
     nextTick(() => {
-        form.value.clearValidate('roleName')
+        form.value.clearValidate('name')
     })
 }
 
 //表单校验
-const validateRoleName = (value: any, callBack: any) => {
+const validateName = (value: any, callBack: any) => {
     if (value.trim().length >= 2) {
         callBack()
     } else {
-        callBack(new Error('职位名称至少两位'))
+        callBack(new Error('角色名称至少两位'))
     }
 }
-
 const rules = {
-    roleName: [{ required: true, trigger: 'blur', validator: validateRoleName }],
+    name: [{ required: true, trigger: 'blur', validator: validateName }],
 }
 
 //确定按钮
@@ -281,7 +280,7 @@ const removeRole = async (id: number) => {
     if (res.code === 200) {
         ElMessage({
             type: 'success',
-            message: '删除成功',
+            message: res.message,
         })
         getHasRole(allRole.value.length > 1 ? pageNo.value : pageNo.value - 1)
     }

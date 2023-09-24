@@ -1,8 +1,8 @@
 <template>
     <!-- 上边搜索 -->
-    <el-card style="height: 80px">
+    <el-card>
         <el-form :inline="true" class="form">
-            <el-form-item label="用户名:">
+            <el-form-item label="名称:">
                 <el-input placeholder="请输入搜索的用户名" v-model="name"></el-input>
             </el-form-item>
             <el-form-item label="分类:">
@@ -18,16 +18,16 @@
         </el-form>
     </el-card>
     <!-- 数据展示 -->
-    <el-card style="margin: 10px 0">
+    <el-card>
         <!-- 上边按钮 -->
         <el-button type="success" size="default" @click="add">
-            添加用户
+            添加
         </el-button>
         <el-button type="danger" size="default" @click="deleteSelect" :disabled="selectIdArr.length ? false : true">
             批量删除
         </el-button>
         <!-- 数据 -->
-        <el-table border :data="listArr" @selection-change="selectChange">
+        <el-table border :data="listArr" @selection-change="selectChange" style="margin: 15px 0">
             <el-table-column type="selection" align="center" width="30px"></el-table-column>
             <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
             <el-table-column label="商品封面" align="center" prop="pic" show-overflow-tooltip width="120px">
@@ -121,7 +121,7 @@
         <!-- 介绍照片墙 -->
         <el-form :model="Params" :inline="true">
             <h2>介绍照片墙</h2>
-            <el-upload v-model:file-list="introduceimgList" action="/api/api/sys/upload" list-type="picture-card"
+            <el-upload v-model:file-list="introduceImgUrlList" action="/api/api/sys/upload" list-type="picture-card"
                 :on-preview="handlePictureCardPreview1" :on-remove="handleRemove1" :on-success="handleAvatarSuccess2">
                 <el-icon>
                     <Plus />
@@ -143,7 +143,6 @@
                 </el-select>
             </el-form-item>
         </el-form>
-
         <!--  -->
         <el-form :model="Params" :inline="true">
             <h2>规格（修改时如果不修改sku无需填写）</h2>
@@ -231,7 +230,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
-import { reqAllProduct, reqAddOrUpdate, reqRemove, reqSku, reqRemoveSKU, reqAddOrUpdateSKU, reqProductInfo } from '@/api/pms/product'
+import { reqAllProduct, reqAddOrUpdate, reqRemove, reqSku, reqAddOrUpdateSKU, reqProductInfo } from '@/api/pms/product'
 import { reqAll } from '@/api/pms/category'
 import { reqAllAttribute } from '@/api/pms/attribute'
 import { reqAllattributeCategory } from '@/api/pms/attributeCategory'
@@ -260,7 +259,6 @@ const Params = reactive<any>({
     subTitle: '',
     attributeValue: [],
     size: [{ name: '', sizeValue: [] }],
-    sizeList: [],
     imgUrl: [],
     introduceImgUrl: [],
     attributeType1: [],
@@ -366,13 +364,13 @@ const cancel = () => {
 }
 
 const fileList = ref<UploadUserFile[]>([])
-const introduceimgList = ref<UploadUserFile[]>([])
+const introduceImgUrlList = ref<UploadUserFile[]>([])
 //添加用户按钮
 const add = () => {
     drawer.value = true
     //存储收集已有的账号信息
     fileList.value = []
-    introduceimgList.value = []
+    introduceImgUrlList.value = []
     // 清空Params对象
     Object.keys(Params).forEach(key => {
         Params[key] = Array.isArray(Params[key]) ? [] : '';
@@ -391,6 +389,9 @@ const update = async (row: any) => {
         Params[key] = Array.isArray(Params[key]) ? [] : '';
     });
     selectedValue.value = []
+    selectedValue1.value = []
+    fileList.value = []
+    introduceImgUrlList.value = []
     let res = await reqProductInfo({ id: row.id })
     if (res.code == 200) {
         // 初始化 Params.size
@@ -406,9 +407,8 @@ const update = async (row: any) => {
             unit: res.data.productInfo.unit,
             productSn: res.data.productInfo.productSn,
             attributeValue: res.data.attributeValue,
-            sizeList: res.data.sizeList,
             imgUrl: res.data.imgUrl,
-            introduceimgList: res.data.introduceImgUrl,
+            introduceImgUrl: res.data.introduceImgUrl,
             attributeCategoryID: res.data.productInfo.attributeCategoryID,
         })
         fetchAttributeList(res.data.productInfo.attributeCategoryID)
@@ -416,18 +416,32 @@ const update = async (row: any) => {
             name: url.substring(url.lastIndexOf('/') + 1),
             url: url
         }));
-        introduceimgList.value = Params.introduceimgList.map((url: string) => ({
+        introduceImgUrlList.value = Params.introduceImgUrl.map((url: string) => ({
             name: url.substring(url.lastIndexOf('/') + 1),
             url: url
         }));
-        selectedValue.value = res.data.attributeValue.attributeType1.map((item: { values: { value: any; }[]; }) => item.values[0].value);
-        // selectedValue1.value = res.data.attributeValue.attributeType2.map(item => item.values[0].value);
+        // if (res.data.attributeValue.attributeType1.length > 0) {
+        //     selectedValue.value = res.data.attributeValue.attributeType1.map((item: { values: { value: any; }[]; }) => item.values[0].value);
+        // }
+        // if (res.data.attributeValue.attributeType2.length > 0) {
+        //     for (let i = 0; i < res.data.attributeValue.attributeType2.length; i++) {
+        //         let valuess = []
+        //         let values = res.data.attributeValue.attributeType2[i].values;
+        //         for (let j = 0; j < values.length; j++) {
+        //             let value = values[j].value;
+        //             valuess.push(value);
+        //         }
+        //         console.log(valuess);
+        //         selectedValue1.value[i] = valuess
+        //     }
+        // }
+        // selectedValue1.value[0] = ['大芒果9斤装单', '大芒果5斤装单'];
     }
 }
 //type1
-let selectedValue = ref<any>([])
+let selectedValue = ref<any>()
 //type2
-let selectedValue1 = ref<any>([])
+let selectedValue1 = ref<any>()
 let convertToArray = (value: any) => {
     return value.split(","); // 将字符串转换为数组
 }
@@ -446,8 +460,10 @@ const save = async () => {
             value: Value
         };
     });
-    for (let i = 0; i < selectedValue1.value.length; i++) {
-        Params.attributeValueList.push(selectedValue1.value[i])
+    if (selectedValue1.value[0]) {
+        for (let i = 0; i < selectedValue1.value.length; i++) {
+            Params.attributeValueList.push(selectedValue1.value[i])
+        }
     }
     for (let i = 0; i < selectedValue.value.length; i++) {
         Params.attributeValueList.push(selectedValue.value[i])
@@ -486,7 +502,6 @@ const handlePictureCardPreview1: UploadProps['onPreview'] = (uploadFile) => {
     dialogVisible1.value = true
 }
 const handleRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
-    console.log(uploadFile, uploadFiles)
     Params.imgUrl = Params.imgUrl.filter((item: string | undefined) => item !== uploadFile.url);
 }
 const handleRemove1: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
@@ -511,7 +526,11 @@ const handleAvatarSuccess1: UploadProps['onSuccess'] = (response) => {
 }
 const handleAvatarSuccess2: UploadProps['onSuccess'] = (response) => {
     //上传返回的数据 图片url  uploadFile
-    Params.introduceImgUrl.push(response.data)
+    // Params.introduceImgUrl.push(response.data)
+    if (Params.introduceImgUrl === null) {
+        Params.introduceImgUrl = []; // 创建一个新的空数组
+    }
+    Params.introduceImgUrl.push(response.data);
     Params.introduceImgUrl.value.clearValidate('introduceImgUrl')
 }
 //上传图片之前出发的钩子函数

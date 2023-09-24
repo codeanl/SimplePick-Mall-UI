@@ -1,6 +1,6 @@
 <template>
     <!-- 上边搜索 -->
-    <el-card style="height: 80px">
+    <el-card>
         <el-form :inline="true" class="form">
             <el-form-item label="用户名:">
                 <el-input placeholder="请输入搜索的用户名" v-model="username"></el-input>
@@ -24,14 +24,14 @@
         </el-form>
     </el-card>
     <!--  -->
-    <el-card style="margin: 10px 0">
+    <el-card>
         <el-button type="success" size="default" @click="addUser">
-            添加用户
+            添加
         </el-button>
         <el-button type="danger" size="default" @click="deleteSelectUser" :disabled="selectIdArr.length ? false : true">
             批量删除
         </el-button>
-        <el-table border :data="ListArr" @selection-change="selectChange">
+        <el-table border :data="ListArr" @selection-change="selectChange" style="margin: 15px 0">
             <el-table-column type="selection" align="center" width="30px"></el-table-column>
             <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
             <el-table-column label="头像" align="center" prop="avatar" show-overflow-tooltip width="60px">
@@ -91,7 +91,7 @@
     </el-card>
     <!-- 抽屉  完成 添加｜修改 的窗口 -->
     <el-dialog v-model="drawer" :title="userParams.id ? '更新会员' : '添加会员'">
-        <el-form :model="userParams" :rules="rules" ref="formRef" :inline="true">
+        <el-form :model="userParams" :rules="rules" ref="formRef">
             <el-form-item label="用户名" prop="username">
                 <el-input placeholder="请您输入用户名" v-model="userParams.username"></el-input>
             </el-form-item>
@@ -126,7 +126,7 @@
                     <el-option label="禁用" value="0" />
                 </el-select>
             </el-form-item>
-            <el-form-item label="门店图片" prop="avatar">
+            <el-form-item label="头像" prop="avatar">
                 <el-upload class="avatar-uploader" action="/api/api/sys/upload" :show-file-list="false"
                     :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
                     <img v-if="userParams.avatar" :src="userParams.avatar" class="avatar" />

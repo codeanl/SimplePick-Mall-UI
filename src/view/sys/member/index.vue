@@ -1,7 +1,7 @@
 <template>
     <!-- 搜索 -->
-    <el-card style="height: 80px">
-        <el-form :inline="true" class="form">
+    <el-card>
+        <el-form class="form">
             <el-form-item label="用户名:">
                 <el-input placeholder="请输入搜索的用户名" v-model="username"></el-input>
             </el-form-item>
@@ -10,6 +10,9 @@
             </el-form-item>
             <el-form-item label="手机号:">
                 <el-input placeholder="请输入搜索的手机号" v-model="phone"></el-input>
+            </el-form-item>
+            <el-form-item label="邮箱:">
+                <el-input placeholder="请输入搜索的邮箱" v-model="email"></el-input>
             </el-form-item>
             <el-form-item label="性别:">
                 <el-select v-model="gender" class="m-2" placeholder="请选择性别">
@@ -26,7 +29,7 @@
             </el-form-item>
             <el-form-item>
                 <el-button type="primary" size="default" @click="search"
-                    :disabled="username.length || nickname.length || phone.length || gender.length || status.length ? false : true">
+                    :disabled="email.length || username.length || nickname.length || phone.length || gender.length || status.length ? false : true">
                     搜索
                 </el-button>
                 <el-button size="default" @click="reset">重置</el-button>
@@ -34,14 +37,14 @@
         </el-form>
     </el-card>
     <!-- 数据列表 -->
-    <el-card style="margin: 10px 0">
+    <el-card>
         <el-button type="success" size="default" @click="addUser">
-            添加用户
+            添加
         </el-button>
         <el-button type="danger" size="default" @click="deleteSelectUser" :disabled="selectIdArr.length ? false : true">
             批量删除
         </el-button>
-        <el-table border :data="userArr" @selection-change="selectChange">
+        <el-table border :data="userArr" @selection-change="selectChange" style="margin: 15px 0">
             <!--复选框 -->
             <el-table-column type="selection" align="center" width="30px"></el-table-column>
             <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
@@ -66,13 +69,14 @@
                 </template>
             </el-table-column>
             <el-table-column label="邮箱" align="center" prop="email" show-overflow-tooltip></el-table-column>
+            <el-table-column label="手机号" align="center" prop="phone" show-overflow-tooltip></el-table-column>
             <el-table-column label="用户角色" align="center" prop="roleName" show-overflow-tooltip></el-table-column>
             <el-table-column label="创建时间" align="center" prop="creat_at" show-overflow-tooltip></el-table-column>
             <el-table-column label="更新时间" align="center" prop="update_at" show-overflow-tooltip></el-table-column>
             <el-table-column label="状态" align="center" prop="status" show-overflow-tooltip width="60px">
                 <template #="{ row }">
                     <el-switch v-model="row.status" class="ml-2"
-                        style="--el-switch-on-color: #13ce66; --el-switch-off-color: #5597ce" active-value="1"
+                        style="--el-switch-on-color: #13ce66; --el-switch-off-color: #f06455;" active-value="1"
                         inactive-value="0" @change="handleChange(row)" />
                 </template>
             </el-table-column>
@@ -163,6 +167,18 @@
                         </el-checkbox>
                     </el-checkbox-group>
                 </el-form-item>
+                <!-- <el-form-item label="自提点" v-if="isZTD()">
+                    <el-select v-model="userParams.status" class="m-2" placeholder="请选择状态">
+                        <el-option label="正常" value="1" />
+                        <el-option label="禁用" value="0" />
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="商家" v-if="isSJ()">
+                    <el-select v-model="userParams.status" class="m-2" placeholder="请选择状态">
+                        <el-option label="正常" value="1" />
+                        <el-option label="禁用" value="0" />
+                    </el-select>
+                </el-form-item> -->
             </el-form>
         </template>
         <template #footer>
@@ -244,7 +260,8 @@ const getHasUser = async (pager = 1) => {
         phone.value,
         nickname.value,
         status.value,
-        gender.value)
+        gender.value,
+        email.value)
     if (res.code == 200) {
         total.value = res.total
         userArr.value = res.data
@@ -271,12 +288,13 @@ const addUser = () => {
         status: '',
         gender: '',
     })
-
     //清除上一次的提示信息
     nextTick(() => {
         formRef.value.clearValidate('username')
-        formRef.value.clearValidate('name')
-        formRef.value.clearValidate('password')
+        formRef.value.clearValidate('nicknem')
+        formRef.value.clearValidate('phone')
+        formRef.value.clearValidate('status')
+        formRef.value.clearValidate('gender')
     })
 }
 
@@ -286,37 +304,43 @@ const updateUser = (row: User) => {
     Object.assign(userParams, row)
     nextTick(() => {
         formRef.value.clearValidate('username')
-        formRef.value.clearValidate('name')
+        formRef.value.clearValidate('nicknem')
+        formRef.value.clearValidate('phone')
+        formRef.value.clearValidate('status')
+        formRef.value.clearValidate('gender')
     })
 }
 
 
 //表单校验 自定义
 const validatorUserName = (rule: any, value: any, callBack: any) => {
-    if (value.trim().length >= 5) {
+    if (value.trim().length >= 5 || value.trim().length <= 20) {
         callBack()
     } else {
-        callBack(new Error('用户名字至少五位'))
+        callBack(new Error('用户名需在5-20位之间'))
     }
 }
-const validatorName = (rule: any, value: any, callBack: any) => {
-    if (value.trim().length >= 5) {
+const validatorNickname = (rule: any, value: any, callBack: any) => {
+    if (value.trim().length >= 5 || value.trim().length <= 20) {
         callBack()
     } else {
-        callBack(new Error('用户昵称至少五位'))
+        callBack(new Error('用户昵称需在5-20位之间'))
     }
 }
-const validatorPassword = (rule: any, value: any, callBack: any) => {
-    if (value.trim().length >= 5) {
-        callBack()
+const validatorPhone = (rule: any, value: any, callBack: any) => {
+    const phoneRegex = /^1[0-9]{10}$/; // 手机号码正则表达式
+    if (phoneRegex.test(value.trim())) {
+        callBack();
     } else {
-        callBack(new Error('用户密码至少六位'))
+        callBack(new Error('请输入有效的手机号码'));
     }
-}
+};
 const rules = {
     username: [{ required: true, trigger: 'blur', validator: validatorUserName }],
-    name: [{ required: true, trigger: 'blur', validator: validatorName }],
-    password: [{ required: true, trigger: 'blur', validator: validatorPassword }],
+    nickname: [{ required: true, trigger: 'blur', validator: validatorNickname }],
+    phone: [{ required: true, trigger: 'blur', validator: validatorPhone }],
+    gender: [{ required: true, trigger: 'blur' }],
+    status: [{ required: true, trigger: 'blur' }],
 }
 
 //窗口保存按钮
@@ -327,7 +351,8 @@ const save = async () => {
         drawer.value = false
         ElMessage({
             type: 'success',
-            message: userParams.id ? '更新成功' : '添加成功',
+            // message: userParams.id ? '更新成功' : '添加成功',
+            message: res.message,
         })
         //更新留在当前页 添加回到第一页
         // getHasUser(userParams.id ? pageNo.value : 1)
@@ -336,7 +361,8 @@ const save = async () => {
         drawer.value = false
         ElMessage({
             type: 'error',
-            message: userParams.id ? '更新失败' : '添加失败',
+            // message: userParams.id ? '更新失败' : '添加失败',
+            message: res.message,
         })
     }
 }
@@ -375,7 +401,7 @@ const handleCheckedUsersChange = (value: string[]) => {
 const confirmClick = async () => {
     let data: any = {
         id: userParams.id as number,
-        roleId: userRole.value.map((item) => {
+        roleId: userRole.value.map((item: any) => {
             return item.id as number
         }),
     }
@@ -383,7 +409,8 @@ const confirmClick = async () => {
     if (res.code === 200) {
         ElMessage({
             type: 'success',
-            message: '分配职务成功',
+            // message: '分配职务成功',
+            message: res.message,
         })
         drawer1.value = false
         getHasUser(pageNo.value)
@@ -395,7 +422,11 @@ const deleteUser = async (userId: number) => {
     const requestData: any = { ids: ids.value }; // 提取 ids 引用的值并构造请求数据对象
     let res: any = await reqRemoveUser(requestData);
     if (res.code == 200) {
-        ElMessage({ type: 'success', message: '删除成功' })
+        ElMessage({
+            type: 'success',
+            // message: '删除成功'
+            message: res.message,
+        })
         getHasUser(userArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
     }
 }
@@ -411,7 +442,11 @@ const deleteSelectUser = async () => {
     const requestData: any = { ids: ids.value };
     let res: any = await reqRemoveUser(requestData);
     if (res.code === 200) {
-        ElMessage({ type: 'success', message: '删除成功' })
+        ElMessage({
+            type: 'success',
+            message: res.message,
+            // message: '删除成功' 
+        })
         getHasUser(userArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
     }
 }
@@ -437,16 +472,41 @@ let handleChange = async (row: any) => {
     }
     let res = await reqAddOrUpdateUser(data)
     if (res.code === 200) {
-        ElMessage({ type: 'success', message: '修改状态成功' })
+        ElMessage({
+            type: 'success',
+            //  message: '修改状态成功' 
+            message: res.message,
+        })
     }
 }
 
 let ResetPassword = async (id: number) => {
     let res = await resetPassword({ id: id })
     if (res.code === 200) {
-        ElMessage({ type: 'success', message: '修改状态成功' })
+        ElMessage({
+            type: 'success',
+            message: res.message,
+            // message: '修改状态成功'
+        })
     }
 }
+
+// let isZTD = () => {
+//     for (let index = 0; index < userRole.value.length; index++) {
+//         if (userRole.value[index].id == 5) {
+//             return true
+//         }
+//     }
+//     return false
+// }
+// let isSJ = () => {
+//     for (let index = 0; index < userRole.value.length; index++) {
+//         if (userRole.value[index].id == 6) {
+//             return true
+//         }
+//     }
+//     return false
+// }
 </script>
 
 <style scoped lang="scss">

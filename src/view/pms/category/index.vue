@@ -1,15 +1,15 @@
 <template>
-    <el-card style="margin: 10px 0">
+    <el-card>
         <el-button type="success" size="default" icon="Plus" @click="add">
-            添加菜单
+            添加
         </el-button>
         <!--  -->
-        <el-table style="width: 100%; margin-bottom: 20px" row-key="id" border :data="ListArr">
+        <el-table style="margin: 15px 0" row-key="id" border :data="ListArr">
             <el-table-column prop="name" label="名称" />
             <!-- <el-table-column prop="type" label="类型" /> -->
             <el-table-column label="图标" align="center" prop="icon" show-overflow-tooltip width="120px">
                 <template #="{ row }">
-                    <img :src="row.icon" alt="图标" style="width: 80px; height: auto;" />
+                    <img :src="row.icon" alt="图标" style="width: 60px; height: auto;" />
                 </template>
             </el-table-column>
             <el-table-column label="类型" align="center" prop="level" show-overflow-tooltip>
@@ -49,7 +49,7 @@
     </el-card>
     <!--  -->
     <el-dialog v-model="dialogVisible" :title="Data.id ? '更新菜单' : '添加菜单'">
-        <el-form :inline="true" ref="formRef">
+        <el-form ref="formRef">
             <el-form-item label="名称">
                 <el-input placeholder="请你输入菜单的名称" v-model="Data.name"></el-input>
             </el-form-item>
@@ -67,7 +67,8 @@
                 <el-input placeholder="请你输入商品单位" v-model="Data.productUnit"></el-input>
             </el-form-item>
             <el-form-item label="排序">
-                <el-input placeholder="请你输入排序" v-model="Data.sort"></el-input>
+                <!-- <el-input placeholder="请你输入排序" v-model="Data.sort"></el-input> -->
+                排在第<el-input-number v-model="Data.sort" :min="1" size="small" controls-position="right" />位
             </el-form-item>
             <el-form-item label="关键词">
                 <el-input placeholder="请你输入关键词" v-model="Data.keywords"></el-input>
@@ -179,7 +180,8 @@ const save = async () => {
         dialogVisible.value = false;
         ElMessage({
             type: 'success',
-            message: Data.id ? '更新成功' : '添加成功',
+            // message: Data.id ? '更新成功' : '添加成功',
+            message: res.message,
         });
         getHas();
     }
@@ -190,10 +192,18 @@ const remove = async (id: number) => {
     let res = await reqRemove(requestData);
     if (res.code == 200) {
         ids.value = [];
-        ElMessage({ type: 'success', message: '删除成功' });
+        ElMessage({
+            type: 'success',
+            message: res.message,
+            // message: '删除成功'
+        });
         getHas();
     } else {
-        ElMessage({ type: 'error', message: '删除失败' });
+        ElMessage({
+            type: 'error',
+            message: '删除失败'
+            // message: res.message,
+        });
     }
 };
 

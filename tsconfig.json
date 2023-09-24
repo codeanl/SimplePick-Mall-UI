@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "allowJs": true,
     "baseUrl": "./", // 解析非相对模块的基地址，默认是当前目录
     "paths": {
       //路径映射

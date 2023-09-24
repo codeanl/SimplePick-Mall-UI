@@ -5,8 +5,8 @@ enum API {
     ADD_URL = '/api/sys/place/add',
     UPDATE_URL = '/api/sys/place/update',
 }
-export const reqPlaceList = (current: number, pageSize: number, name: string, place: string, phone: string) =>
-    request.get<any, any>(API.ALLPlACE_URL, { params: { current, pageSize, name, place, phone } });
+export const reqPlaceList = (current: number, pageSize: number, name: string, place: string, phone: string, principal: string) =>
+    request.get<any, any>(API.ALLPlACE_URL, { params: { current, pageSize, name, place, phone, principal } });
 
 export const reqRemovePlace = (data: number) =>
     request.post<any, any>(API.DELETEPLACE_URL, data)

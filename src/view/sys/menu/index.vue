@@ -4,7 +4,7 @@
             添加菜单
         </el-button>
         <!--  -->
-        <el-table style="width: 100%; margin-bottom: 20px" row-key="id" border :data="PermissionArr">
+        <el-table style="width: 100%; margin-top: 20px" row-key="id" border :data="PermissionArr">
             <el-table-column prop="name" label="名称" />
             <!-- <el-table-column prop="type" label="类型" /> -->
             <el-table-column label="类型" align="center" prop="type" show-overflow-tooltip>
@@ -48,8 +48,8 @@
     </el-card>
     <!--  -->
     <el-dialog v-model="dialogVisible" :title="menuData.id ? '更新菜单' : '添加菜单'">
-        <el-form :inline="true">
-            <el-form-item label="名称">
+        <el-form :rules="rules" ref="form">
+            <el-form-item label="名称" prop="name">
                 <el-input placeholder="请你输入菜单的名称" v-model="menuData.name"></el-input>
             </el-form-item>
             <el-form-item label="类型">
@@ -67,7 +67,8 @@
                 <el-input placeholder="请你输入路径" v-model="menuData.url"></el-input>
             </el-form-item>
             <el-form-item label="排序">
-                <el-input placeholder="请你输入排序" v-model="menuData.orderNum"></el-input>
+                该菜单排在第<el-input-number v-model="menuData.orderNum" :min="1" size="small" controls-position="right" />位
+                <!-- <el-input placeholder="请你输入排序" v-model="menuData.orderNum"></el-input> -->
             </el-form-item>
             <el-form-item label="TAG">
                 <el-input placeholder="请你输入TAG" v-model="menuData.tag"></el-input>
@@ -171,6 +172,13 @@ const removeMenu = async (id: number) => {
         ElMessage({ type: 'error', message: '删除失败' });
     }
 };
+
+
+//form组件实例
+let form = ref<any>()
+const rules = reactive<any>({
+
+})
 </script>
   
 <style lang="scss" scoped></style>

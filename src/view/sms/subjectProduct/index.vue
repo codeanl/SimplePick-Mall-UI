@@ -13,27 +13,9 @@
             </el-card>
         </div>
         <div class="right" v-if="nowSubject">
-            <!-- 上边搜索 -->
-            <el-card>
-                <el-form :inline="true" class="form">
-                    <el-form-item label="状态:">
-                        <el-select v-model="status" class="m-2" placeholder="请选择状态">
-                            <el-option label="正常" value="1" />
-                            <el-option label="禁用" value="0" />
-                        </el-select>
-                    </el-form-item>
-                    <el-form-item>
-                        <!-- 搜索内容为空的时候搜索按钮禁用 -->
-                        <el-button type="primary" size="default" @click="search" :disabled="status ? false : true">
-                            搜索
-                        </el-button>
-                    </el-form-item>
-                </el-form>
-            </el-card>
-            <!-- 数据列表 -->
             <el-card>
                 <el-button type="success" size="default" @click="addProduct">
-                    添加用户
+                    添加
                 </el-button>
                 <el-table border :data="productArr" @selection-change="selectChange">
                     <el-table-column type="selection" align="center" width="30px"></el-table-column>
@@ -106,7 +88,7 @@ let settingStore = useLayoutSettingStore()
 //默认页码
 let pageNo = ref<number>(1)
 //默认个数
-let pageSize = ref<number>(20)
+let pageSize = ref<number>(10)
 let total = ref<number>(0)
 //收集删除的id
 let ids = ref<number[]>([])
@@ -145,6 +127,8 @@ const getHas = async () => {
     )
     if (res.code == 200) {
         subjectArr.value = res.data
+        nowSubject.value = res.data[0].id
+        getProductList()
     }
 }
 
