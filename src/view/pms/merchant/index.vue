@@ -38,7 +38,7 @@
         <el-button v-else type="primary" size="default" icon="Edit" @click="look">审核</el-button>
         <!-- 数据 -->
         <el-table border :data="listArr" @selection-change="selectChange" style="margin: 15px 0">
-            <el-table-column type="selection" align="center" width="30px"></el-table-column>
+            <el-table-column type="selection" align="center" width="40px"></el-table-column>
             <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
             <el-table-column label="店铺图片" align="center" prop="pic" show-overflow-tooltip width="120px">
                 <template #="{ row }">

@@ -1,7 +1,7 @@
 <template>
     <!--  上边搜索 -->
-    <el-card style="height: 80px">
-        <el-form :inline="true" class="form">
+    <el-card>
+        <el-form :inline="true">
             <el-form-item label="状态:">
                 <el-select v-model="status" class="m-2" placeholder="请选择状态">
                     <!-- ：0->待处理；1->退货中；2->已完成；3->已拒绝' -->
@@ -20,9 +20,9 @@
         </el-form>
     </el-card>
     <!--  -->
-    <el-card style="margin: 10px 0">
-        <el-table border :data="listArr" @selection-change="selectChange">
-            <el-table-column type="selection" align="center" width="30px"></el-table-column>
+    <el-card>
+        <el-table border :data="listArr" @selection-change="selectChange" style="margin: 15px 0">
+            <el-table-column type="selection" align="center" width="40px"></el-table-column>
             <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
             <el-table-column label="订单号" align="center" prop="order.orderInfo.orderSn"
                 show-overflow-tooltip></el-table-column>

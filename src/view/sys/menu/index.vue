@@ -1,10 +1,10 @@
 <template>
-    <el-card style="margin: 10px 0">
+    <el-card>
         <el-button type="success" size="default" icon="Plus" @click="addPermission">
             添加菜单
         </el-button>
         <!--  -->
-        <el-table style="width: 100%; margin-top: 20px" row-key="id" border :data="PermissionArr">
+        <el-table style=" margin: 20px 0" row-key="id" border :data="PermissionArr">
             <el-table-column prop="name" label="名称" />
             <!-- <el-table-column prop="type" label="类型" /> -->
             <el-table-column label="类型" align="center" prop="type" show-overflow-tooltip>
@@ -47,7 +47,7 @@
         </el-table>
     </el-card>
     <!--  -->
-    <el-dialog v-model="dialogVisible" :title="menuData.id ? '更新菜单' : '添加菜单'">
+    <el-dialog v-model="dialogVisible" :title="menuData.id ? '更新' : '添加'">
         <el-form :rules="rules" ref="form">
             <el-form-item label="名称" prop="name">
                 <el-input placeholder="请你输入菜单的名称" v-model="menuData.name"></el-input>

@@ -1,24 +1,21 @@
 <template>
     <div class="container">
         <div class="left">
-            <el-card>
-                <h2>专题列表</h2>
-                <el-table border :data="subjectArr">
-                    <el-table-column label="全部" align="center" prop="name">
-                        <template #="{ row }">
-                            <span @click="getProduct(row)">{{ row.name }}</span>
-                        </template>
-                    </el-table-column>
-                </el-table>
-            </el-card>
+            <h2>专题列表</h2>
+            <el-menu default-active="1">
+                <el-menu-item v-for="(nowSubject, index) in subjectArr" :index="index" @click="getProduct(nowSubject)"
+                    :key="nowSubject">
+                    <span>{{ nowSubject.name }}</span>
+                </el-menu-item>
+            </el-menu>
         </div>
-        <div class="right" v-if="nowSubject">
+        <div class=" right" v-if="nowSubject">
             <el-card>
                 <el-button type="success" size="default" @click="addProduct">
                     添加
                 </el-button>
-                <el-table border :data="productArr" @selection-change="selectChange">
-                    <el-table-column type="selection" align="center" width="30px"></el-table-column>
+                <el-table border :data="productArr" @selection-change="selectChange" style="margin: 15px 0">
+                    <el-table-column type="selection" align="center" width="40px"></el-table-column>
                     <!-- <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column> -->
                     <el-table-column label="商品名称" align="center" prop="productInfo.name"
                         show-overflow-tooltip></el-table-column>
@@ -56,7 +53,7 @@
 
     <!--  -->
     <el-dialog v-model="drawer" title="添加">
-        <el-table border :data="productList" @selection-change="selectChange">
+        <el-table border :data="productList" @selection-change="selectChange" style="margin-bottom: 15px">
             <el-table-column type="selection" align="center" width="30px"></el-table-column>
             <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
             <el-table-column label="图片" align="center" prop="pic" show-overflow-tooltip width="120px">
@@ -68,6 +65,10 @@
             <el-table-column label="货号" align="center" prop="productSn" show-overflow-tooltip></el-table-column>
             <el-table-column label="销量" align="center" prop="sale" show-overflow-tooltip></el-table-column>
         </el-table>
+        <!-- 分页 -->
+        <el-pagination v-model:current-page="pageNo1" v-model:page-size="pageSize1" :page-sizes="[5, 10, 15, 20]"
+            :background="true" layout="prev, pager, next, jumper, -> , sizes, total" :total="total1"
+            @current-change="getProductList1()" @size-change="handler1" />
         <template #footer>
             <div style="flex: auto">
                 <el-button type="primary" @click="addHotRecommend">添加</el-button>
@@ -87,9 +88,9 @@ let settingStore = useLayoutSettingStore()
 
 //默认页码
 let pageNo = ref<number>(1)
-//默认个数
 let pageSize = ref<number>(10)
 let total = ref<number>(0)
+
 //收集删除的id
 let ids = ref<number[]>([])
 let productIds = ref<number[]>([])
@@ -127,6 +128,7 @@ const getHas = async () => {
     )
     if (res.code == 200) {
         subjectArr.value = res.data
+        //
         nowSubject.value = res.data[0].id
         getProductList()
     }
@@ -154,12 +156,31 @@ const search = () => {
     getProductList()
     status.value = ''
 }
-
 //下拉改变
 const handler = () => {
     getProductList()
 }
 
+let pageNo1 = ref<number>(1)
+let pageSize1 = ref<number>(5)
+let total1 = ref<number>(0)
+let namedd = ref<any>()
+let categoryId = ref<any>()
+let getProductList1 = async () => {
+    let res = await reqAllProduct(
+        pageNo1.value,
+        pageSize1.value,
+        namedd.value,
+        categoryId.value,
+    )
+    if (res.code === 200) {
+        productList.value = res.data
+        total1.value = res.total
+    }
+}
+const handler1 = () => {
+    getProductList1()
+}
 const deleteSubjectProduct = async (id: number) => {
     ids.value.push(id);
     const requestData: any = { ids: ids.value };
@@ -171,10 +192,7 @@ const deleteSubjectProduct = async (id: number) => {
 }
 const addProduct = async () => {
     drawer.value = true
-    let res = await reqAllProduct()
-    if (res.code == 200) {
-        productList.value = res.data
-    }
+    getProductList1()
 }
 const addHotRecommend = async () => {
     productIds.value = selectIdArr.value.map((item) => {
@@ -204,14 +222,15 @@ const addHotRecommend = async () => {
 
 .left {
     width: 15%;
+    margin: 0 30px;
 
     h2 {
         font-size: 17px;
+        margin-bottom: 10px;
     }
 }
 
 .right {
-
     width: 80%;
     height: 100%;
     float: right;

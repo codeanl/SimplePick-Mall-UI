@@ -1,7 +1,7 @@
 <template>
     <!-- 搜索 -->
     <el-card>
-        <el-form class="form">
+        <el-form :inline="true">
             <el-form-item label="用户名:">
                 <el-input placeholder="请输入搜索的用户名" v-model="username"></el-input>
             </el-form-item>
@@ -46,7 +46,7 @@
         </el-button>
         <el-table border :data="userArr" @selection-change="selectChange" style="margin: 15px 0">
             <!--复选框 -->
-            <el-table-column type="selection" align="center" width="30px"></el-table-column>
+            <el-table-column type="selection" align="center" width="40px"></el-table-column>
             <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
             <el-table-column label="头像" align="center" prop="avatar" show-overflow-tooltip width="60px">
                 <template #="{ row }">
@@ -112,7 +112,7 @@
             @current-change="getHasUser" @size-change="handler" />
     </el-card>
     <!-- 添加｜修改  -->
-    <el-dialog v-model="drawer" :title="userParams.id ? '更新用户' : '添加用户'">
+    <el-dialog v-model="drawer" :title="userParams.id ? '更新' : '添加'">
         <el-form :model="userParams" :rules="rules" ref="formRef">
             <el-form-item label="用户名" prop="username">
                 <el-input placeholder="请您输入用户名" v-model="userParams.username"></el-input>
@@ -509,10 +509,4 @@ let ResetPassword = async (id: number) => {
 // }
 </script>
 
-<style scoped lang="scss">
-.form {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-</style>
+<style scoped lang="scss"></style>

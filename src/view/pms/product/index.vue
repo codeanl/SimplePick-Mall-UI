@@ -9,8 +9,22 @@
                 <el-tree-select v-model="CateID" :data="CateListArr" check-strictly
                     :props="{ key: 'categoryId', label: 'name' }" node-key="id" :render-after-expand="false" />
             </el-form-item>
+            <el-form-item label="价格区间:">
+                <el-input style="width:150px" v-model="minPrice" placeholder="请输入最小值" />--
+                <el-input style="width:150px" v-model="maxPrice" placeholder="请输入最大值" />
+            </el-form-item>
+            <el-form-item label="排序方式:">
+                <el-select v-model="searchType" class="m-2" placeholder="请选择排序方式">
+                    <el-option label="发布时间" value=1 />
+                    <el-option label="销量" value=2 />
+                    <el-option label="点击数" value=3 />
+                    <el-option label="价格低->高" value=4 />
+                    <el-option label="价格高->低" value=5 />
+                </el-select>
+            </el-form-item>
             <el-form-item>
-                <el-button type="primary" size="default" @click="search" :disabled="name || CateID ? false : true">
+                <el-button type="primary" size="default" @click="search"
+                    :disabled="name || CateID || searchType || minPrice || maxPrice ? false : true">
                     搜索
                 </el-button>
                 <el-button size="default" @click="reset">重置</el-button>
@@ -28,7 +42,7 @@
         </el-button>
         <!-- 数据 -->
         <el-table border :data="listArr" @selection-change="selectChange" style="margin: 15px 0">
-            <el-table-column type="selection" align="center" width="30px"></el-table-column>
+            <el-table-column type="selection" align="center" width="40px"></el-table-column>
             <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
             <el-table-column label="商品封面" align="center" prop="pic" show-overflow-tooltip width="120px">
                 <template #="{ row }">
@@ -40,6 +54,7 @@
             <el-table-column label="商品描述" align="center" prop="desc" show-overflow-tooltip></el-table-column>
             <el-table-column label="价格" align="center" prop="price" show-overflow-tooltip></el-table-column>
             <el-table-column label="市场价" align="center" prop="originalPrice" show-overflow-tooltip></el-table-column>
+            <el-table-column label="销量" align="center" prop="sale" show-overflow-tooltip></el-table-column>
             <el-table-column label="单位" align="center" prop="unit" show-overflow-tooltip></el-table-column>
             <el-table-column label="操作" width="300px" align="center">
                 <template #="{ row }">
@@ -173,6 +188,7 @@
             <el-table-column label="SKU名字" prop="name"></el-table-column>
             <el-table-column label="SKU价格" prop="price"></el-table-column>
             <el-table-column label="库存" prop="stock"></el-table-column>
+            <el-table-column label="销量" prop="sale"></el-table-column>
             <el-table-column label="TAG" prop="tag"></el-table-column>
             <el-table-column label="描述" prop="description"></el-table-column>
             <el-table-column label="操作" width="300px" align="center">
@@ -237,6 +253,10 @@ import { reqAllattributeCategory } from '@/api/pms/attributeCategory'
 //数据
 let name = ref<string>('')
 let CateID = ref<number>()
+let searchType = ref<number>()
+let minPrice = ref<number>()
+let maxPrice = ref<number>()
+
 //分页数据
 let pageNo = ref<number>(1)
 let pageSize = ref<number>(10)
@@ -295,6 +315,9 @@ const getHas = async (pager = 1) => {
         pageSize.value,
         name.value,
         CateID.value,
+        searchType.value,
+        minPrice.value,
+        maxPrice.value,
     )
     if (res.code == 200) {
         total.value = res.total
@@ -616,7 +639,7 @@ const reset = () => {
 const search = () => {
     getHas()
     name.value = ''
-    CateID.value = 0
+    CateID.value = ''
 }
 </script>
 
@@ -635,7 +658,6 @@ h2 {
 
 .avatar-uploader .el-upload {
     border: 1px dashed var(--el-border-color);
-    border-radius: 6px;
     cursor: pointer;
     position: relative;
     overflow: hidden;

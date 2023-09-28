@@ -1,8 +1,7 @@
 <template>
     <!--  上边搜索 -->
-    <!-- todo -->
-    <el-card style="height: 80px">
-        <el-form :inline="true" class="form">
+    <el-card>
+        <el-form :inline="true">
             <el-form-item label="订单号:">
                 <el-input placeholder="请输入搜索的用户名" v-model="orderSn"></el-input>
             </el-form-item>
@@ -30,16 +29,16 @@
         </el-form>
     </el-card>
     <!--  -->
-    <el-card style="margin: 10px 0">
-        <el-table border :data="listArr">
-            <el-table-column type="selection" align="center" width="30px"></el-table-column>
+    <el-card>
+        <el-table border :data="listArr" style="margin: 15px 0">
+            <el-table-column type="selection" align="center" width="40px"></el-table-column>
             <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
             <el-table-column label="订单号" align="center" prop="orderSn" show-overflow-tooltip></el-table-column>
             <el-table-column label="用户名" align="center" prop="memberUserName" show-overflow-tooltip></el-table-column>
             <el-table-column label="支付方式" align="center" prop="payType" show-overflow-tooltip>
                 <template #="{ row }">
                     <template v-if="row.payType === '1'">
-                        <el-tag key="item.label" class="mx-1" type="danger" effect="light">
+                        <el-tag key="item.label" class="mx-1" type="success" effect="light">
                             微信
                         </el-tag>
                     </template>
@@ -53,12 +52,12 @@
             <el-table-column label="订单类型" align="center" prop="orderType" show-overflow-tooltip>
                 <template #="{ row }">
                     <template v-if="row.orderType === '1'">
-                        <el-tag key="item.label" class="mx-1" type="danger" effect="light">
+                        <el-tag key="item.label" class="mx-1" type="success" effect="light">
                             正常订单
                         </el-tag>
                     </template>
                     <template v-if="row.orderType === '2'">
-                        <el-tag key="item.label" class="mx-1" type="success" effect="light">
+                        <el-tag key="item.label" class="mx-1" type="danger" effect="light">
                             秒杀订单
                         </el-tag>
                     </template>
@@ -119,7 +118,7 @@
                     <el-button type="primary" size="small" icon="Edit" @click="look(row)">
                         查看订单
                     </el-button>
-                    <el-button v-if="row.status == '1'" type="success" size="small" icon="Edit" @click="addone(row)">
+                    <el-button v-if="row.status == '1'" type="success" size="small" icon="Edit" @click="toDeliver(row)">
                         订单发货
                     </el-button>
                     <el-button v-if="row.status == '2'" type="info" size="small" icon="Edit" @click="addone(row)">
@@ -182,19 +181,19 @@
                 <p style="color: red;">¥{{ orderInfo?.payAmount }}</p>
             </el-descriptions-item>
             <el-descriptions-item label="支付方式">
-                <el-tag class="mx-1" effect="dark" v-if="orderInfo?.payType == '1'">
-                    支付宝
-                </el-tag>
-                <el-tag class="mx-1" type="success" effect="dark" v-if="orderInfo?.payType == '2'">
+                <el-tag class="mx-1" effect="success" v-if="orderInfo?.payType == '1'">
                     微信
+                </el-tag>
+                <el-tag class="mx-1" effect="dark" v-if="orderInfo?.payType == '2'">
+                    支付宝
                 </el-tag>
 
             </el-descriptions-item>
             <el-descriptions-item label="订单类型">
-                <el-tag class="mx-1" effect="dark" v-if="orderInfo?.orderType == '1'">
+                <el-tag class="mx-1" effect="success" v-if="orderInfo?.orderType == '1'">
                     正常订单
                 </el-tag>
-                <el-tag class="mx-1" type="success" effect="dark" v-if="orderInfo?.orderType == '2'">
+                <el-tag class="mx-1" type="dark" effect="dark" v-if="orderInfo?.orderType == '2'">
                     秒杀订单
                 </el-tag>
             </el-descriptions-item>
@@ -209,6 +208,15 @@
             style="margin: 40px 0 0 20px;">
             <el-descriptions-item label="收货人">{{ orderInfo?.receiverName }}</el-descriptions-item>
             <el-descriptions-item label="联系电话">{{ orderInfo?.receiverPhone }}</el-descriptions-item>
+        </el-descriptions>
+        <el-descriptions title="商家信息" direction="horizontal" :column="1" :size="size" border style="margin: 40px 0 0 20px;">
+            <el-descriptions-item label="自提点图片">
+                <img :src="merchantInfo?.pic" alt="" style="width:200px">
+            </el-descriptions-item>
+            <el-descriptions-item label="名称">{{ merchantInfo?.name }}</el-descriptions-item>
+            <el-descriptions-item label="详细地址">{{ merchantInfo?.address }}</el-descriptions-item>
+            <el-descriptions-item label="负责人">{{ merchantInfo?.principal }}</el-descriptions-item>
+            <el-descriptions-item label="联系电话">{{ merchantInfo?.phone }}</el-descriptions-item>
         </el-descriptions>
         <el-descriptions title="自提点信息" direction="horizontal" :column="1" :size="size" border
             style="margin: 40px 0 0 20px;">
@@ -241,6 +249,7 @@ let listArr = ref<any>([])
 const orderInfo = ref<any>(null)
 const skuList = ref<any[]>([])
 const placeInfo = ref<any>(null)
+const merchantInfo = ref<any>(null)
 //收集用户查找的关键字
 let orderSn = ref<string>('')
 let memberUsername = ref<string>('')
@@ -290,12 +299,14 @@ let look = async (row: any) => {
         orderInfo.value = res.data.orderInfo
         skuList.value = res.data.skuList
         placeInfo.value = res.data.placeInfo
+        merchantInfo.value = res.data.merchantInfo
     }
 }
 let addone = async (row: any) => {
     let data: any = {
         id: row.id as number,
         status: String(parseInt(row.status) + 1)
+
     }
     let res = await reqAddOrUpdateOrder(data)
     if (res.code === 200) {
@@ -303,6 +314,32 @@ let addone = async (row: any) => {
         window.location.reload()
     }
 }
+
+let getCurrentDateTime = () => {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // 月份从 0 开始，需要加 1，并补零
+    const day = String(now.getDate()).padStart(2, '0'); // 补零
+    const hours = String(now.getHours()).padStart(2, '0'); // 补零
+    const minutes = String(now.getMinutes()).padStart(2, '0'); // 补零
+    const seconds = String(now.getSeconds()).padStart(2, '0'); // 补零
+    const dateTime = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    return dateTime;
+}
+const currentDateTime = getCurrentDateTime();
+let toDeliver = async (row: any) => {
+    let data: any = {
+        id: row.id as number,
+        status: '2',
+        deliveryTime: currentDateTime,
+    }
+    let res = await reqAddOrUpdateOrder(data)
+    if (res.code === 200) {
+        ElMessage({ type: 'success', message: '修改成功' })
+        window.location.reload()
+    }
+}
+
 </script>
 
 <style scoped>

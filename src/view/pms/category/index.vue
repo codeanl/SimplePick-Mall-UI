@@ -48,7 +48,7 @@
         </el-table>
     </el-card>
     <!--  -->
-    <el-dialog v-model="dialogVisible" :title="Data.id ? '更新菜单' : '添加菜单'">
+    <el-dialog v-model="dialogVisible" :title="Data.id ? '更新' : '添加'">
         <el-form ref="formRef">
             <el-form-item label="名称">
                 <el-input placeholder="请你输入菜单的名称" v-model="Data.name"></el-input>

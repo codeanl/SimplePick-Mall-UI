@@ -1,7 +1,7 @@
 <template>
     <!-- 上边搜索 -->
     <el-card>
-        <el-form :inline="true" class="form">
+        <el-form :inline="true">
             <el-form-item label="名称:">
                 <el-input placeholder="请输入搜索的用户名" v-model="name"></el-input>
             </el-form-item>
@@ -23,13 +23,13 @@
     <!--  -->
     <el-card>
         <el-button type="success" size="default" @click="add">
-            添加用户
+            添加
         </el-button>
         <el-button type="danger" size="default" @click="deleteSelect" :disabled="selectIdArr.length ? false : true">
             批量删除
         </el-button>
         <el-table border :data="listArr" @selection-change="selectChange" style="margin: 15px 0">
-            <el-table-column type="selection" align="center" width="30px"></el-table-column>
+            <el-table-column type="selection" align="center" width="40px"></el-table-column>
             <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
             <el-table-column label="名称" align="center" prop="name" show-overflow-tooltip></el-table-column>
             <el-table-column label="状态" align="center" prop="status" show-overflow-tooltip>

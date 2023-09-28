@@ -1,7 +1,7 @@
 <template>
     <!-- 上边搜索 -->
-    <el-card style="height: 80px">
-        <el-form :inline="true" class="form">
+    <el-card>
+        <el-form :inline="true">
             <el-form-item label="名称:">
                 <el-input placeholder="请输入搜索的用户名" v-model="name"></el-input>
             </el-form-item>
@@ -21,15 +21,15 @@
         </el-form>
     </el-card>
     <!--  -->
-    <el-card style="margin: 10px 0">
+    <el-card>
         <el-button type="success" size="default" @click="add">
             添加
         </el-button>
         <el-button type="danger" size="default" @click="deleteSelect" :disabled="selectIdArr.length ? false : true">
             批量删除
         </el-button>
-        <el-table border :data="listArr" @selection-change="selectChange">
-            <el-table-column type="selection" align="center" width="30px"></el-table-column>
+        <el-table border :data="listArr" @selection-change="selectChange" style="margin: 15px 0">
+            <el-table-column type="selection" align="center" width="40px"></el-table-column>
             <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
             <el-table-column label="广告图片" align="center" prop="pic" show-overflow-tooltip width="120px">
                 <template #="{ row }">
@@ -38,6 +38,9 @@
             </el-table-column>
             <el-table-column label="名称" align="center" prop="name" show-overflow-tooltip></el-table-column>
             <el-table-column label="链接" align="center" prop="url" show-overflow-tooltip></el-table-column>
+            <el-table-column label="备注" align="center" prop="note" show-overflow-tooltip></el-table-column>
+            <el-table-column label="排序" align="center" prop="sort" show-overflow-tooltip></el-table-column>
+            <el-table-column label="点击次数" align="center" prop="clickCount" show-overflow-tooltip></el-table-column>
             <el-table-column label="状态" align="center" prop="status" show-overflow-tooltip width="60px">
                 <template #="{ row }">
                     <el-switch v-model="row.status" class="ml-2"
@@ -45,8 +48,6 @@
                         inactive-value="0" @change="handleChange(row)" />
                 </template>
             </el-table-column>
-            <el-table-column label="备注" align="center" prop="note" show-overflow-tooltip></el-table-column>
-            <el-table-column label="点击次数" align="center" prop="clickCount" show-overflow-tooltip></el-table-column>
             <el-table-column label="操作" width="300px" align="center">
                 <template #="{ row }">
                     <el-button type="primary" size="small" icon="Edit" @click="update(row)">
@@ -79,6 +80,9 @@
             </el-form-item>
             <el-form-item label="备注" prop="note">
                 <el-input placeholder="请您输入备注" v-model="Params.note"></el-input>
+            </el-form-item>
+            <el-form-item label="排序">
+                排在第<el-input-number v-model="Params.sort" :min="1" size="small" controls-position="right" />位
             </el-form-item>
             <el-form-item label="状态" prop="status">
                 <el-select v-model="Params.status" class="m-2" placeholder="请选择性别">
@@ -141,6 +145,7 @@ let Params = reactive<any>({
     note: '',
     name: '',
     clickCount: 0,
+    sort: 0,
 })
 //组件挂载完毕
 onMounted(() => {

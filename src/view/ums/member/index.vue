@@ -1,7 +1,7 @@
 <template>
     <!-- 上边搜索 -->
     <el-card>
-        <el-form :inline="true" class="form">
+        <el-form :inline="true">
             <el-form-item label="用户名:">
                 <el-input placeholder="请输入搜索的用户名" v-model="username"></el-input>
             </el-form-item>
@@ -32,7 +32,7 @@
             批量删除
         </el-button>
         <el-table border :data="ListArr" @selection-change="selectChange" style="margin: 15px 0">
-            <el-table-column type="selection" align="center" width="30px"></el-table-column>
+            <el-table-column type="selection" align="center" width="40px"></el-table-column>
             <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
             <el-table-column label="头像" align="center" prop="avatar" show-overflow-tooltip width="60px">
                 <template #="{ row }">

@@ -16,14 +16,14 @@
     <!--  -->
     <el-card>
         <el-button type="success" size="default" icon="Plus" @click="addRole">
-            添加角色
+            添加
         </el-button>
         <el-button type="danger" size="default" @click="deleteSelectRole" :disabled="selectIdArr.length ? false : true">
             批量删除
         </el-button>
         <el-table border style="margin: 15px 0" :data="allRole" @selection-change="selectChange">
-            <el-table-column type="selection" align="center" width="30px"></el-table-column>
-            <el-table-column label="ID" align="center" prop="id"></el-table-column>
+            <el-table-column type="selection" align="center" width="40px"></el-table-column>
+            <el-table-column label="ID" align="center" prop="id" width="50px"></el-table-column>
             <el-table-column label="角色名称" align="center" show-overflow-tooltip prop="name"></el-table-column>
             <el-table-column label="创建者" align="center" show-overflow-tooltip prop="create_by"></el-table-column>
             <el-table-column label="创建时间" align="center" show-overflow-tooltip prop="create_at"></el-table-column>
@@ -54,7 +54,7 @@
             @current-change="getHasRole" @size-change="sizeHandler" />
     </el-card>
     <!-- 对话框 添加｜修改-->
-    <el-dialog v-model="dialogVisible" :title="RoleParams.id ? '更新角色' : '添加角色'">
+    <el-dialog v-model="dialogVisible" :title="RoleParams.id ? '更新' : '添加'">
         <el-form :model="RoleParams" :rules="rules" ref="form">
             <el-form-item label="角色名称" prop="name">
                 <el-input placeholder="请你输入角色名称" v-model="RoleParams.name"></el-input>

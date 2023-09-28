@@ -1,8 +1,8 @@
 <template>
     <!-- 上边搜索 -->
     <el-card>
-        <el-form :inline="true" class="form">
-            <el-form-item label="用户名:">
+        <el-form :inline="true">
+            <el-form-item label="名称:">
                 <el-input placeholder="请输入搜索的用户名" v-model="name"></el-input>
             </el-form-item>
             <el-form-item label="所属属性:">
@@ -10,7 +10,7 @@
                     :props="{ key: 'categoryId', label: 'name' }" node-key="id" :render-after-expand="false" />
             </el-form-item>
             <el-form-item label="类型:">
-                <el-select v-model="type" class="m-2" placeholder="请选择状态">
+                <el-select v-model="type" class="m-2" placeholder="请选择类型">
                     <el-option label="属性" value="1" />
                     <el-option label="规格" value="2" />
                 </el-select>
@@ -27,9 +27,9 @@
     <!--  -->
     <el-card>
         <!-- 展示数据列表 -->
-        <el-button type="primary" size="default" icon="Plus" @click="add">添加</el-button>
+        <el-button type="success" size="default" icon="Plus" @click="add">添加</el-button>
         <el-table border style="margin:15px 0" :data="ListArr">
-            <el-table-column label="编号" width="70px" align="center" prop="id"></el-table-column>
+            <el-table-column label="编号" width="50px" align="center" prop="id"></el-table-column>
             <el-table-column label="属性名称" align="center" prop="name"></el-table-column>
             <el-table-column label="类型" align="center" prop="type">
                 <template #="{ row }">
@@ -58,6 +58,10 @@
                 </template>
             </el-table-column>
         </el-table>
+        <!-- 分页 -->
+        <el-pagination v-model:current-page="pageNo" v-model:page-size="pageSize" :page-sizes="[5, 10, 15, 20]"
+            :background="true" layout="prev, pager, next, jumper, -> , sizes, total" :total="total" @current-change="getHas"
+            @size-change="handler" />
     </el-card>
     <!--  -->
     <el-dialog v-model="drawer">
@@ -74,7 +78,7 @@
             </el-form-item>
             <el-form-item label="排序">
                 <!-- <el-input placeholder="请输入排序" v-model="Params.sort"></el-input> -->
-                该菜单排在第<el-input-number v-model="Params.sort" :min="1" size="small" controls-position="right" />位
+                排在第<el-input-number v-model="Params.sort" :min="1" size="small" controls-position="right" />位
             </el-form-item>
             <el-form-item label="类型">
                 <el-select v-model="Params.type" class="m-2" placeholder="请选择类型">
@@ -83,13 +87,14 @@
                 </el-select>
             </el-form-item>
         </el-form>
-        <el-button type="primary" size="default" @click="save">保存</el-button>
-        <el-button type="primary" size="default" @click="cancel">取消</el-button>
+        <template #footer>
+            <span class="dialog-footer">
+                <el-button type="primary" size="default" @click="save">保存</el-button>
+                <el-button type="primary" size="default" @click="cancel">取消</el-button>
+            </span>
+        </template>
+
     </el-dialog>
-    <!-- 分页 -->
-    <el-pagination v-model:current-page="pageNo" v-model:page-size="pageSize" :page-sizes="[5, 10, 15, 20]"
-        :background="true" layout="prev, pager, next, jumper, -> , sizes, total" :total="total" @current-change="getHas"
-        @size-change="handler" />
 </template>
 
 <script setup lang="ts">
@@ -108,7 +113,7 @@ let total = ref<number>(0)
 //数据
 let name = ref<string>('')
 let type = ref<string>('')
-let CateID = ref<number>()
+let CateID = ref<any>()
 // 
 let drawer = ref<boolean>(false)
 //分类

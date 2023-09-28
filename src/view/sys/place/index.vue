@@ -1,7 +1,7 @@
 <template>
     <!-- 上边搜索 -->
     <el-card>
-        <el-form :inline="true" class="form">
+        <el-form :inline="true">
             <el-form-item label="名称:">
                 <el-input placeholder="请输入搜索的用户名" v-model="name"></el-input>
             </el-form-item>
@@ -26,7 +26,7 @@
     <!--  -->
     <el-card>
         <el-button type="success" size="default" @click="add">
-            添加自提点
+            添加
         </el-button>
         <el-button type="danger" size="default" @click="deleteSelect" :disabled="selectIdArr.length ? false : true">
             批量删除
@@ -36,7 +36,7 @@
         </el-badge>
         <el-button v-else type="primary" size="default" icon="Edit" @click="look">查看审核</el-button>
         <el-table border :data="listArr" @selection-change="selectChange" style="margin-top: 15px;">
-            <el-table-column type="selection" align="center" width="30px"></el-table-column>
+            <el-table-column type="selection" align="center" width="40px"></el-table-column>
             <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
             <el-table-column label="门店图片" align="center" prop="pic" show-overflow-tooltip width="120px">
                 <template #="{ row }">
@@ -76,7 +76,7 @@
     </el-card>
     <!--  -->
     <!-- 抽屉  完成 添加｜修改 的窗口 -->
-    <el-dialog v-model="drawer" :title="Params.id ? '更新自提点' : '添加自提点'">
+    <el-dialog v-model="drawer" :title="Params.id ? '更新' : '添加'">
         <el-form :model="Params" ref="formRef">
             <el-form-item label="名称" prop="name">
                 <el-input placeholder="请您输入名称" v-model="Params.name"></el-input>

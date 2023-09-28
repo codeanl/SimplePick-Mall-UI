@@ -1,7 +1,7 @@
 <template>
     <!-- 上边搜索 -->
-    <el-card style="height: 80px">
-        <el-form :inline="true" class="form">
+    <el-card>
+        <el-form :inline="true">
             <el-form-item label="名称:">
                 <el-input placeholder="请输入搜索的用户名" v-model="name"></el-input>
             </el-form-item>
@@ -29,7 +29,7 @@
             批量删除
         </el-button>
         <el-table border :data="listArr" @selection-change="selectChange" style="margin: 15px 0">
-            <el-table-column type="selection" align="center" width="30px"></el-table-column>
+            <el-table-column type="selection" align="center" width="40px"></el-table-column>
             <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
             <el-table-column label="专题封面" align="center" prop="pic" show-overflow-tooltip width="120px">
                 <template #="{ row }">
@@ -38,18 +38,11 @@
             </el-table-column>
             <el-table-column label="名称" align="center" prop="name" show-overflow-tooltip></el-table-column>
             <el-table-column label="排序" align="center" prop="sort" show-overflow-tooltip></el-table-column>
-            <el-table-column label="状态" align="center" prop="status" show-overflow-tooltip>
+            <el-table-column label="状态" align="center" prop="status" show-overflow-tooltip width="60px">
                 <template #="{ row }">
-                    <template v-if="row.status === '0'">
-                        <el-tag key="item.label" class="mx-1" type="danger" effect="light">
-                            不显示
-                        </el-tag>
-                    </template>
-                    <template v-if="row.status === '1'">
-                        <el-tag key="item.label" class="mx-1" type="success" effect="light">
-                            显示
-                        </el-tag>
-                    </template>
+                    <el-switch v-model="row.status" class="ml-2"
+                        style="--el-switch-on-color: #13ce66; --el-switch-off-color: #ff4949" active-value="1"
+                        inactive-value="0" @change="handleChange(row)" />
                 </template>
             </el-table-column>
             <el-table-column label="操作" width="300px" align="center">
@@ -78,8 +71,8 @@
             <el-form-item label="名称" prop="name">
                 <el-input placeholder="请您输入名称" v-model="Params.name"></el-input>
             </el-form-item>
-            <el-form-item label="排序" prop="sort">
-                <el-input placeholder="请您输入详细地址" v-model="Params.sort"></el-input>
+            <el-form-item label="排序">
+                排在第<el-input-number v-model="Params.sort" :min="1" size="small" controls-position="right" />位
             </el-form-item>
             <el-form-item label="状态" prop="status">
                 <el-select v-model="Params.status" class="m-2" placeholder="请选择状态">
@@ -268,6 +261,17 @@ const save = async () => {
             type: 'error',
             message: Params.id ? '更新失败' : '添加失败',
         })
+    }
+}
+//状态修改
+let handleChange = async (row: any) => {
+    let data: any = {
+        id: row.id as number,
+        status: row.status
+    }
+    let res = await reqAddOrUpdate(data)
+    if (res.code === 200) {
+        ElMessage({ type: 'success', message: '修改状态成功' })
     }
 }
 </script>
