@@ -10,11 +10,10 @@
             </el-form-item>
             <el-form-item label="状态:">
                 <el-select v-model="status" class="m-2" placeholder="请选择状态">
-                    <!--  0->待付款；1->待发货；2->已发货；3->确认收货；4->订单完成(完成评价)；5->无效订单' -->
                     <el-option label="待付款" value="0" />
                     <el-option label="待发货" value="1" />
-                    <el-option label="已发货" value="2" />
-                    <el-option label="确认收货" value="3" />
+                    <el-option label="运输中" value="2" />
+                    <el-option label="待提货" value="3" />
                     <el-option label="订单完成" value="4" />
                     <el-option label="无效订单" value="5" />
                 </el-select>
@@ -87,27 +86,27 @@
                         </el-tag>
                     </template>
                     <template v-if="row.status === '1'">
-                        <el-tag key="item.label" class="mx-1" type="success" effect="light">
+                        <el-tag key="item.label" class="mx-1" type="primary" effect="light">
                             待发货
                         </el-tag>
                     </template>
                     <template v-if="row.status === '2'">
-                        <el-tag key="item.label" class="mx-1" type="success" effect="light">
-                            已发货
+                        <el-tag key="item.label" class="mx-1" type="Primary" effect="light">
+                            运输中
                         </el-tag>
                     </template>
                     <template v-if="row.status === '3'">
-                        <el-tag key="item.label" class="mx-1" type="success" effect="light">
-                            已完成
+                        <el-tag key="item.label" class="mx-1" type="Warning" effect="light">
+                            待提货
                         </el-tag>
                     </template>
                     <template v-if="row.status === '4'">
                         <el-tag key="item.label" class="mx-1" type="success" effect="light">
-                            已关闭
+                            订单完成
                         </el-tag>
                     </template>
                     <template v-if="row.status === '5'">
-                        <el-tag key="item.label" class="mx-1" type="success" effect="light">
+                        <el-tag key="item.label" class="mx-1" type="Info" effect="light">
                             无效订单
                         </el-tag>
                     </template>
@@ -118,20 +117,14 @@
                     <el-button type="primary" size="small" icon="Edit" @click="look(row)">
                         查看订单
                     </el-button>
-                    <el-button v-if="row.status == '1'" type="success" size="small" icon="Edit" @click="toDeliver(row)">
+                    <el-button v-if="row.status == '1'" type="danger" size="small" icon="Edit" @click="toDeliver(row)">
                         订单发货
                     </el-button>
-                    <el-button v-if="row.status == '2'" type="info" size="small" icon="Edit" @click="addone(row)">
-                        确认收货
+                    <el-button v-if="row.status == '2'" type="warning" size="small" icon="Edit" @click="addone(row)">
+                        已到店
                     </el-button>
                     <el-button v-if="row.status == '3'" type="danger" size="small" icon="Edit" @click="addone(row)">
-                        删除订单
-                    </el-button>
-                    <el-button v-if="row.status == '4'" type="warning" size="small" icon="Edit" @click="addone(row)">
-                        关闭订单
-                    </el-button>
-                    <el-button v-if="row.status == '5'" type="danger" size="small" icon="Edit">
-                        删除订单
+                        完成提货
                     </el-button>
                 </template>
             </el-table-column>

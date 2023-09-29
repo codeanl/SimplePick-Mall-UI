@@ -31,6 +31,7 @@
             <el-table-column prop="sort" label="排序" />
             <el-table-column prop="keywords" label="关键词" />
             <el-table-column prop="description" label="描述" />
+            <el-table-column prop="count" label="商品数量" />
             <el-table-column label="操作" width="260px">
                 <template #="{ row }">
                     <el-button type="primary" size="small" @click="update(row)">

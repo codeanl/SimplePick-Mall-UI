@@ -71,7 +71,6 @@
     </el-card>
     <!--  -->
     <el-dialog v-model="drawer" :title="Params.id ? '更新' : '添加'" width="70%">
-
         <el-form :model="Params" ref="formRef">
             <el-form-item label="名称" prop="name">
                 <el-input placeholder="请您输入名称" v-model="Params.name"></el-input>
@@ -103,14 +102,14 @@
         </template>
     </el-dialog>
     <!--  -->
-    <el-dialog v-model="drawer1" width="70%">
+    <el-dialog v-model="drawer1" width="70%" :before-close="beforeCloseHandler">
         <el-select v-model="applyStatus" class="m-2" placeholder="请选择状态" @change="applyStatusChange">
             <el-option label="待审核" value="0" />
             <el-option label="已同意" value="1" />
             <el-option label="已拒绝" value="2" />
         </el-select>
         <!-- 数据 -->
-        <el-table border :data="listArr1" @selection-change="selectChange">
+        <el-table border :data="listArr1" @selection-change="selectChange" style="margin:15px 0">
             <el-table-column type="selection" align="center" width="30px"></el-table-column>
             <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
             <el-table-column label="店铺图片" align="center" prop="pic" show-overflow-tooltip width="120px">
@@ -364,7 +363,6 @@ let lookInfo = (row: any) => {
 }
 
 let applyStatusChange = () => {
-    console.log(applyStatus.value);
     getHas1()
 }
 
@@ -438,6 +436,12 @@ let ok = async () => {
         }
 
     }
+}
+//恢复到原来
+let beforeCloseHandler = (done: any) => {
+    applyStatus.value = '0'
+    getHas1()
+    done(); // 允许对话框关闭
 }
 </script>
 
