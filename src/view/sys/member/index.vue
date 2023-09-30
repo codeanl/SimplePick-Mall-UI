@@ -317,6 +317,7 @@ const updateUser = (row: User) => {
 
 //表单校验 自定义
 const validatorUserName = (rule: any, value: any, callBack: any) => {
+    console.log(rule)
     if (value.trim().length >= 5 || value.trim().length <= 20) {
         callBack()
     } else {
@@ -324,6 +325,7 @@ const validatorUserName = (rule: any, value: any, callBack: any) => {
     }
 }
 const validatorNickname = (rule: any, value: any, callBack: any) => {
+    console.log(rule)
     if (value.trim().length >= 5 || value.trim().length <= 20) {
         callBack()
     } else {
@@ -331,6 +333,7 @@ const validatorNickname = (rule: any, value: any, callBack: any) => {
     }
 }
 const validatorPhone = (rule: any, value: any, callBack: any) => {
+    console.log(rule)
     const phoneRegex = /^1[0-9]{10}$/; // 手机号码正则表达式
     if (phoneRegex.test(value.trim())) {
         callBack();

@@ -1,4 +1,3 @@
-import { reqRemoveAttr } from './../attr/index'
 import request from '@/util/request'
 import type {
   HasSpuResponseData,

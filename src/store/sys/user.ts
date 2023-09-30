@@ -1,12 +1,10 @@
 import { defineStore } from 'pinia'
 import router from '@/router'
-import { reqLogin, reqUserInfo, reqLogout } from '@/api/user'
+import { reqLogin, reqUserInfo } from '@/api/user'
 import type {
     LoginFormData,
     LoginResponseData,
-    userInfoResponseData,
 } from '@/api/user/type'
-import type { UserState } from './types/types'
 import { SET_TOKEN, GET_TOKEN, REMOVE_TOKEN } from '@/util/token'
 import { constantRoute, asyncRoute, anyRoute } from '@/router/routes'
 
@@ -26,7 +24,7 @@ function filterAsyncRoute(asyncRoute: any, routes: any) {
 
 let useUserStore = defineStore('User', {
     // 小仓库存储数据的地方
-    state: (): UserState => {
+    state: (): any => {
         return {
             token: GET_TOKEN()!,
             menuRoutes: constantRoute,

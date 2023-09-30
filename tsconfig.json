@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "types": [
+      "nprogress",
+      "element-plus"
+    ],
     "allowJs": true,
     "baseUrl": "./", // 解析非相对模块的基地址，默认是当前目录
     "paths": {
@@ -18,7 +22,7 @@
     ],
     "skipLibCheck": true,
     /* Bundler mode */
-    "moduleResolution": "bundler",
+    "moduleResolution": "node",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,

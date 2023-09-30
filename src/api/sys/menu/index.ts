@@ -1,5 +1,4 @@
 import request from '@/util/request'
-import type { MenuParams, PermissionResponseData } from './type'
 
 enum API {
   ALLPERMISSION_URL = '/api/sys/menu/list',
