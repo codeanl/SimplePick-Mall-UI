@@ -1,10 +1,29 @@
-# 使用nginx镜像
-FROM nginx
+# Dockerfile
 
-# 删除nginx 默认配置
-RUN rm /etc/nginx/conf.d/default.conf
-# 添加我们自己的配置 default.conf 在下面
-ADD default.conf /etc/nginx/conf.d/
-# 把刚才生成dist文件夹下的文件copy到nginx下面去
-COPY dist/  /usr/share/nginx/html/
+# 使用 Node.js 作为基础镜像
+FROM node:16 as build-stage
 
+# 设置工作目录
+WORKDIR /app
+
+# 安装项目依赖
+COPY package*.json ./
+RUN npm install
+
+# 拷贝项目文件
+COPY . .
+
+# 构建 Vue.js 应用
+RUN npm run build
+
+# 使用 Nginx 作为运行环境
+FROM nginx:latest as production-stage
+
+# 拷贝构建后的文件到 Nginx
+COPY --from=build-stage /app/dist /usr/share/nginx/html
+
+# 暴露端口
+EXPOSE 80
+
+# 运行 Nginx
+CMD ["nginx", "-g", "daemon off;"]
