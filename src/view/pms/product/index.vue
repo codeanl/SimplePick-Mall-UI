@@ -246,6 +246,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
+import { ElMessage, UploadUserFile } from 'element-plus';
 import { reqAllProduct, reqAddOrUpdate, reqRemove, reqSku, reqAddOrUpdateSKU, reqProductInfo } from '@/api/pms/product'
 import { reqAll } from '@/api/pms/category'
 import { reqAllAttribute } from '@/api/pms/attribute'
@@ -314,10 +315,10 @@ const getHas = async (pager = 1) => {
         pageNo.value,
         pageSize.value,
         name.value,
-        CateID.value,
-        searchType.value,
-        minPrice.value,
-        maxPrice.value,
+        CateID.value as number,
+        searchType.value as number,
+        minPrice.value as number,
+        maxPrice.value as number,
     )
     if (res.code == 200) {
         total.value = res.total
@@ -362,8 +363,10 @@ const deleteSelect = async () => {
     const requestData: any = { ids: ids.value };
     let res: any = await reqRemove(requestData);
     if (res.code === 200) {
-        ElMessage({ type: 'success', message: '删除成功' })
         getHas(listArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 // 删除按钮
@@ -372,8 +375,10 @@ const deleteproduct = async (id: number) => {
     const requestData: any = { ids: ids.value };
     let res: any = await reqRemove(requestData);
     if (res.code == 200) {
-        ElMessage({ type: 'success', message: '删除成功' })
         getHas(listArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 
@@ -443,9 +448,9 @@ const update = async (row: any) => {
             name: url.substring(url.lastIndexOf('/') + 1),
             url: url
         }));
-        // if (res.data.attributeValue.attributeType1.length > 0) {
-        //     selectedValue.value = res.data.attributeValue.attributeType1.map((item: { values: { value: any; }[]; }) => item.values[0].value);
-        // }
+        if (res.data.attributeValue.attributeType1.length > 0) {
+            selectedValue.value = res.data.attributeValue.attributeType1.map((item: { values: { value: any; }[]; }) => item.values[0].value);
+        }
         // if (res.data.attributeValue.attributeType2.length > 0) {
         //     for (let i = 0; i < res.data.attributeValue.attributeType2.length; i++) {
         //         let valuess = []
@@ -496,18 +501,11 @@ const save = async () => {
     let res: any = await reqAddOrUpdate(Params)
     if (res.code == 200) {
         drawer.value = false
-        ElMessage({
-            type: 'success',
-            message: Params.id ? '更新成功' : '添加成功',
-        })
         // window.location.reload()
         getHas()
+        ElMessage({ type: 'success', message: res.message })
     } else {
-        drawer.value = false
-        ElMessage({
-            type: 'error',
-            message: Params.id ? '更新失败' : '添加失败',
-        })
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 
@@ -525,9 +523,11 @@ const handlePictureCardPreview1: UploadProps['onPreview'] = (uploadFile) => {
     dialogVisible1.value = true
 }
 const handleRemove: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
+    console.log(uploadFiles);
     Params.imgUrl = Params.imgUrl.filter((item: string | undefined) => item !== uploadFile.url);
 }
 const handleRemove1: UploadProps['onRemove'] = (uploadFile, uploadFiles) => {
+    console.log(uploadFiles);
     Params.introduceImgUrl = Params.introduceImgUrl.filter((item: string | undefined) => item !== uploadFile.url);
 }
 //图片上传
@@ -586,6 +586,9 @@ let look = async (id: number) => {
     let res: any = await reqSku({ productID: id })
     if (res.code == 200) {
         skuArr.value = res.data
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 
@@ -608,17 +611,11 @@ const savesku = async () => {
     if (res.code == 200) {
         drawer2.value = false
         look(SkuParams.productId)
-        ElMessage({
-            type: 'success',
-            message: SkuParams.id ? '更新成功' : '添加成功',
-        })
         // window.location.reload()
         getHas()
+        ElMessage({ type: 'success', message: res.message })
     } else {
-        ElMessage({
-            type: 'error',
-            message: SkuParams.id ? '更新失败' : '添加失败',
-        })
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 
@@ -639,7 +636,7 @@ const reset = () => {
 const search = () => {
     getHas()
     name.value = ''
-    CateID.value = ''
+    CateID.value = 0
 }
 </script>
 

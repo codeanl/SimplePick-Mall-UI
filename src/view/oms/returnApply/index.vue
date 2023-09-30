@@ -119,8 +119,9 @@
 
 <script setup lang="ts">
 // ------------------------------------------------------------
-import { ref, onMounted, reactive, nextTick, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { reqReturnApplyAll, reqAddOrUpdateReturnApply } from '@/api/oms/returnApply'
+import { ElMessage } from 'element-plus';
 //setting仓库
 import useLayoutSettingStore from '@/store/setting'
 let settingStore = useLayoutSettingStore()
@@ -139,7 +140,6 @@ let orderInfo = ref<any>([])
 let memberUsername = ref<any>('')
 let status = ref<any>('')
 //收集删除的id
-let ids = ref<number[]>([])
 //多选框选择的id
 let selectIdArr = ref<any[]>([])
 //复选框选择
@@ -147,15 +147,10 @@ const selectChange = (value: any) => {
     selectIdArr.value = value
 }
 //组件实例
-let formRef = ref<any>()
 //定义响应式数据 抽屉的显示隐藏
 let drawer = ref<boolean>(false)
 let drawer1 = ref<boolean>(false)
-let Params = reactive<any>({
-    id: 0,
-    name: '',
-    status: '',
-})
+
 //组件挂载完毕
 onMounted(() => {
     getHas()
@@ -171,6 +166,9 @@ const getHas = async (pager = 1) => {
     if (res.code == 200) {
         total.value = res.total
         listArr.value = res.data
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 //下拉改变
@@ -207,9 +205,11 @@ let change = async () => {
     }
     let res = await reqAddOrUpdateReturnApply(data)
     if (res.code === 200) {
-        ElMessage({ type: 'success', message: '修改成功' })
         getHas()
         drawer1.value = false
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 function getStatusValue(label: string): string | number {

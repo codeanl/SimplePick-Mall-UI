@@ -100,6 +100,7 @@
 </template>
 
 <script setup lang="ts">
+import { ElMessage, UploadProps } from 'element-plus';
 import { ref, onMounted, reactive } from 'vue'
 import { reqsubjectList, reqRemovesubject, reqAddOrUpdate } from '@/api/sms/subject'
 //setting仓库
@@ -151,6 +152,9 @@ const getHas = async (pager = 1) => {
     if (res.code == 200) {
         total.value = res.total
         listArr.value = res.data
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 //下拉改变
@@ -164,8 +168,10 @@ const deletePlace = async (id: number) => {
     const requestData: any = { ids: ids.value };
     let res: any = await reqRemovesubject(requestData);
     if (res.code == 200) {
-        ElMessage({ type: 'success', message: '删除成功' })
         getHas(listArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 //批量删除用户按钮
@@ -176,8 +182,10 @@ const deleteSelect = async () => {
     const requestData: any = { ids: ids.value };
     let res: any = await reqRemovesubject(requestData);
     if (res.code === 200) {
-        ElMessage({ type: 'success', message: '删除成功' })
         getHas(listArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 
@@ -214,7 +222,6 @@ const update = (row: any) => {
     Object.assign(Params, row)
 }
 
-import type { UploadProps } from 'element-plus'
 //图片上传成功的钩子
 const handleAvatarSuccess: UploadProps['onSuccess'] = (response) => {
     //上传返回的数据 图片url  uploadFile
@@ -250,17 +257,11 @@ const save = async () => {
     let res: any = await reqAddOrUpdate(Params)
     if (res.code == 200) {
         drawer.value = false
-        ElMessage({
-            type: 'success',
-            message: Params.id ? '更新成功' : '添加成功',
-        })
+        ElMessage({ type: 'success', message: res.message })
         getHas()
     } else {
         drawer.value = false
-        ElMessage({
-            type: 'error',
-            message: Params.id ? '更新失败' : '添加失败',
-        })
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 //状态修改
@@ -271,7 +272,9 @@ let handleChange = async (row: any) => {
     }
     let res = await reqAddOrUpdate(data)
     if (res.code === 200) {
-        ElMessage({ type: 'success', message: '修改状态成功' })
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 </script>
@@ -286,7 +289,6 @@ let handleChange = async (row: any) => {
 
 .avatar-uploader .el-upload {
     border: 1px dashed var(--el-border-color);
-    border-radius: 6px;
     cursor: pointer;
     position: relative;
     overflow: hidden;

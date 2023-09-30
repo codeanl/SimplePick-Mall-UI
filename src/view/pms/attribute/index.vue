@@ -98,7 +98,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, nextTick, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
+import { ElMessage } from 'element-plus';
 //获取属性
 import { reqAllAttribute, reqAddOrUpdate, reqRemove } from '@/api/pms/attribute'
 import { reqAllattributeCategory } from '@/api/pms/attributeCategory'
@@ -120,7 +121,6 @@ let drawer = ref<boolean>(false)
 let CateListArr = ref<any>([]);
 let ids = ref<number[]>([]);
 //准备一个数组：将来存储对于的组件实例
-let inputArr = ref<any>([])
 //收集新增的数据
 let Params = reactive<any>({
     id: 0,
@@ -150,6 +150,10 @@ const getHas = async () => {
     if (res1.code === 200) {
         CateListArr.value = res1.data
     }
+    ElMessage({ type: 'success', message: res.message })
+    if (res.code === 400 || res1.code === 400) {
+        ElMessage({ type: 'success', message: res.message })
+    }
 }
 //下拉改变
 const handler = () => {
@@ -164,7 +168,7 @@ let add = () => {
         sort: 0,
         type: '',
         value: '',
-        attributeCategoryID: 0,
+        attributeCategoryID: '',
     })
     drawer.value = true
 }
@@ -175,74 +179,24 @@ let update = (row: any) => {
     Object.assign(Params, JSON.parse(JSON.stringify(row)))
 }
 
-//添加属性值
-let addAttrValue = () => {
-    //像数组添加属性值对象
-    Params.attributeValue.push({
-        name: '',
-        flag: true
-    })
-    nextTick(() => {
-        inputArr.value[Params.attributeValue.length - 1].focus()
-    })
-}
 
 //取消按钮
 let cancel = () => {
     drawer.value = false
 }
 
-//失去 焦点 查看模式  就是把input变成div
-let toLook = (row: any, $index: number) => {
-    if (row.valueName.trim() === '') {
-        // 清除掉
-        Params.name.splice($index, 1)
-        ElMessage({
-            type: 'error',
-            message: '属性值不能为空',
-        })
-        return
-    }
-    //属性相同 
-    let repeat = Params.attributeValue.find((item) => {
-        if (item !== row) {
-            return item.name === row.name
-        }
-    })
-    if (repeat) {
-        //将重复的清除
-        Params.attributeValue.splice($index, 1)
-        ElMessage({
-            type: 'error',
-            message: '属性值不能重复',
-        })
-        return
-    }
-    //   
-    row.flag = false
-}
-const toEdit = (row: any, $index: number) => {
-    row.flag = true
-    nextTick(() => {
-        inputArr.value[$index].focus()
-    })
-}
+
+
 //保存按钮
 const save = async () => {
     Params.sort = parseInt(Params.sort)
     let res: any = await reqAddOrUpdate(Params)
     if (res.code === 200) {
         drawer.value = false
-        ElMessage({
-            type: 'success',
-            message: Params.id ? '修改成功' : '添加成功',
-        })
         getHas()
+        ElMessage({ type: 'success', message: res.message })
     } else {
-        ElMessage({
-            type: 'error',
-            message: Params.id ? '修改失败' : '添加失败',
-        })
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 
@@ -251,18 +205,12 @@ const save = async () => {
 let deleteAttr = async (id: number) => {
     ids.value.push(id);
     const requestData: any = { ids: ids.value };
-    let result = await reqRemove(requestData);
-    if (result.code === 200) {
-        ElMessage({
-            type: 'success',
-            message: '删除成功',
-        })
+    let res = await reqRemove(requestData);
+    if (res.code === 200) {
         getHas()
+        ElMessage({ type: 'success', message: res.message })
     } else {
-        ElMessage({
-            type: 'error',
-            message: '删除失败',
-        })
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 

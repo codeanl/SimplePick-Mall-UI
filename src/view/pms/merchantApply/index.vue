@@ -65,7 +65,8 @@
   
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
-import { reqAllMerchantApply, reqAddOrUpdateMerchantApply, reqRemoveMerchantApply } from '@/api/pms/merchantApply'
+import { ElMessage } from 'element-plus';
+import { reqAddOrUpdateMerchantApply } from '@/api/pms/merchantApply'
 const form = reactive({
     principalName: '',
     principalPhone: '',

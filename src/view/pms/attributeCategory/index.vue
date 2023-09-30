@@ -69,6 +69,9 @@ const getHas = async () => {
     let res: any = await reqAllattributeCategory();
     if (res.code === 200) {
         ListArr.value = res.data;
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 };
 const ListArrWithRoot = computed(() => {
@@ -96,12 +99,10 @@ const save = async () => {
     let res: any = await reqAddOrUpdate(Data);
     if (res.code === 200) {
         dialogVisible.value = false;
-        ElMessage({
-            type: 'success',
-            // message: Data.id ? '更新成功' : '添加成功',
-            message: res.message,
-        });
         getHas();
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 };
 
@@ -111,14 +112,10 @@ const remove = async (id: number) => {
     let res = await reqRemove(requestData);
     if (res.code == 200) {
         ids.value = [];
-        ElMessage({
-            type: 'success',
-            //  message: '删除成功'
-            message: res.message,
-        });
         getHas();
+        ElMessage({ type: 'success', message: res.message })
     } else {
-        ElMessage({ type: 'error', message: '删除失败' });
+        ElMessage({ type: 'error', message: res.message })
     }
 };
 </script>

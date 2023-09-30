@@ -20,6 +20,7 @@
 import { ref, reactive } from 'vue'
 import { reqUpdatePwd } from '@/api/sys/user'
 import { useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus';
 let $router = useRouter()
 
 let pwdRef = ref<any>()
@@ -29,7 +30,8 @@ const Pwd = reactive({
     confirmPassword: ''
 });
 
-const equalToPassword = (rule, value, callback) => {
+const equalToPassword = (rule: any, value: any, callback: any) => {
+    console.log(rule)
     if (Pwd.newPassword !== value) {
         callback(new Error("两次输入的密码不一致"));
     } else {
@@ -46,16 +48,10 @@ let submit = async () => {
     await pwdRef.value.validate()
     let res = await reqUpdatePwd(Pwd)
     if (res.code == 200) {
-        ElMessage({
-            type: 'success',
-            message: '更新成功',
-        })
         $router.push({ path: '/login' })
+        ElMessage({ type: 'success', message: res.message })
     } else {
-        ElMessage({
-            type: 'error',
-            message: '更新失败',
-        })
+        ElMessage({ type: 'error', message: res.message })
     }
 };
 /** 关闭按钮 */

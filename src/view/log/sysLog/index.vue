@@ -19,13 +19,13 @@
         </el-form>
     </el-card>
     <!--  -->
-    <el-card style="margin: 10px 0">
+    <el-card>
         <el-button type="danger" size="default" @click="deleteSelectLoginLog" :disabled="selectIdArr.length ? false : true">
             批量删除
         </el-button>
-        <el-table border :data="listArr" @selection-change="selectChange">
-            <el-table-column type="selection" align="center" width="30px"></el-table-column>
-            <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
+        <el-table border :data="listArr" @selection-change="selectChange" style="margin: 15px 0">
+            <el-table-column type="selection" align="center" width="40px"></el-table-column>
+            <el-table-column label="id" align="center" prop="id" width="80px"></el-table-column>
             <el-table-column label="头像" align="center" prop="avatar" show-overflow-tooltip width="60px">
                 <template #="{ row }">
                     <img :src="row.avatar" alt="头像" style="width: 40px; height: 40px; border-radius: 50%;" />
@@ -35,7 +35,30 @@
                 width="100px"></el-table-column>
             <el-table-column label="用户名字" align="center" prop="username" show-overflow-tooltip></el-table-column>
             <el-table-column label="IP" align="center" prop="ip" show-overflow-tooltip></el-table-column>
-            <el-table-column label="请求方式" align="center" prop="method" show-overflow-tooltip></el-table-column>
+            <el-table-column label="请求方式" align="center" prop="type">
+                <template #="{ row }">
+                    <template v-if="row.method === 'GET'">
+                        <el-tag class="mx-1" type="success" effect="light">
+                            GET
+                        </el-tag>
+                    </template>
+                    <template v-if="row.method === 'POST'">
+                        <el-tag class="mx-1" type="warning" effect="light">
+                            POST
+                        </el-tag>
+                    </template>
+                    <template v-if="row.method === 'DELETE'">
+                        <el-tag class="mx-1" type="danger" effect="light">
+                            DELETE
+                        </el-tag>
+                    </template>
+                    <template v-if="row.method === 'PUT'">
+                        <el-tag class="mx-1" type="warning" effect="light">
+                            PUT
+                        </el-tag>
+                    </template>
+                </template>
+            </el-table-column>
             <el-table-column label="请求内容" align="center" prop="operation" show-overflow-tooltip></el-table-column>
             <el-table-column label="创建时间" align="center" prop="createTime" show-overflow-tooltip></el-table-column>
             <el-table-column label="操作" width="300px" align="center">
@@ -58,8 +81,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive, nextTick } from 'vue'
+import { ref, onMounted } from 'vue'
 import { reqSystemLog, reqRemoveSystemLog } from '@/api/sys/log'
+import { ElMessage } from 'element-plus';
 //setting仓库
 import useLayoutSettingStore from '@/store/setting'
 let settingStore = useLayoutSettingStore()
@@ -68,8 +92,9 @@ let pageNo = ref<number>(1)
 //默认个数
 let pageSize = ref<number>(10)
 let total = ref<number>(0)
+let status = ref<any>('')
 //数据列表
-let listArr = ref<Records>([])
+let listArr = ref<any>([])
 //收集用户查找的关键字
 let method = ref<string>('')
 //收集删除的id
@@ -95,6 +120,9 @@ const getHasUser = async (pager = 1) => {
     if (res.code == 200) {
         total.value = res.total
         listArr.value = res.data
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 //搜索按钮
@@ -114,8 +142,10 @@ const deleteLog = async (id: number) => {
     const requestData: any = { ids: ids.value };
     let res: any = await reqRemoveSystemLog(requestData);
     if (res.code == 200) {
-        ElMessage({ type: 'success', message: '删除成功' })
+        ElMessage({ type: 'success', message: res.message })
         getHasUser(listArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 
@@ -127,8 +157,10 @@ const deleteSelectLoginLog = async () => {
     const requestData: any = { ids: ids.value };
     let res: any = await reqRemoveSystemLog(requestData);
     if (res.code === 200) {
-        ElMessage({ type: 'success', message: '删除成功' })
+        ElMessage({ type: 'success', message: res.message })
         getHasUser(listArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 //重置按钮

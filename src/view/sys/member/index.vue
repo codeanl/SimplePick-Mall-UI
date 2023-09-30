@@ -241,7 +241,7 @@ let userRole = ref<any>([])
 //准备批量删除用户的id
 let selectIdArr = ref<User[]>([])
 //收集删除的id
-let ids = ref<number[]>([])
+let ids = ref<any[]>([])
 //setting仓库
 import useLayoutSettingStore from '@/store/setting'
 let settingStore = useLayoutSettingStore()
@@ -265,6 +265,9 @@ const getHasUser = async (pager = 1) => {
     if (res.code == 200) {
         total.value = res.total
         userArr.value = res.data
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 //下拉改变
@@ -349,21 +352,13 @@ const save = async () => {
     let res: any = await reqAddOrUpdateUser(userParams)
     if (res.code == 200) {
         drawer.value = false
-        ElMessage({
-            type: 'success',
-            // message: userParams.id ? '更新成功' : '添加成功',
-            message: res.message,
-        })
+        ElMessage({ type: 'success', message: res.message })
         //更新留在当前页 添加回到第一页
         // getHasUser(userParams.id ? pageNo.value : 1)
         window.location.reload()
     } else {
         drawer.value = false
-        ElMessage({
-            type: 'error',
-            // message: userParams.id ? '更新失败' : '添加失败',
-            message: res.message,
-        })
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 //取消按钮
@@ -407,13 +402,11 @@ const confirmClick = async () => {
     }
     let res: any = await reqAddOrUpdateUser(data)
     if (res.code === 200) {
-        ElMessage({
-            type: 'success',
-            // message: '分配职务成功',
-            message: res.message,
-        })
         drawer1.value = false
         getHasUser(pageNo.value)
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 // 删除用户按钮
@@ -422,12 +415,10 @@ const deleteUser = async (userId: number) => {
     const requestData: any = { ids: ids.value }; // 提取 ids 引用的值并构造请求数据对象
     let res: any = await reqRemoveUser(requestData);
     if (res.code == 200) {
-        ElMessage({
-            type: 'success',
-            // message: '删除成功'
-            message: res.message,
-        })
         getHasUser(userArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 //复选框选择
@@ -442,12 +433,10 @@ const deleteSelectUser = async () => {
     const requestData: any = { ids: ids.value };
     let res: any = await reqRemoveUser(requestData);
     if (res.code === 200) {
-        ElMessage({
-            type: 'success',
-            message: res.message,
-            // message: '删除成功' 
-        })
         getHasUser(userArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 
@@ -472,41 +461,22 @@ let handleChange = async (row: any) => {
     }
     let res = await reqAddOrUpdateUser(data)
     if (res.code === 200) {
-        ElMessage({
-            type: 'success',
-            //  message: '修改状态成功' 
-            message: res.message,
-        })
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 
 let ResetPassword = async (id: number) => {
     let res = await resetPassword({ id: id })
     if (res.code === 200) {
-        ElMessage({
-            type: 'success',
-            message: res.message,
-            // message: '修改状态成功'
-        })
+        if (res.code === 200) {
+            ElMessage({ type: 'success', message: res.message })
+        } else {
+            ElMessage({ type: 'error', message: res.message })
+        }
     }
 }
-
-// let isZTD = () => {
-//     for (let index = 0; index < userRole.value.length; index++) {
-//         if (userRole.value[index].id == 5) {
-//             return true
-//         }
-//     }
-//     return false
-// }
-// let isSJ = () => {
-//     for (let index = 0; index < userRole.value.length; index++) {
-//         if (userRole.value[index].id == 6) {
-//             return true
-//         }
-//     }
-//     return false
-// }
 </script>
 
 <style scoped lang="scss"></style>

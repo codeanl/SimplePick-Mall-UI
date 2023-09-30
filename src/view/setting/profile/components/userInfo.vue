@@ -18,13 +18,13 @@
         </el-form-item>
         <el-form-item>
             <el-button type="primary" @click="submit">保存</el-button>
-            <el-button type="danger" @click="close">关闭</el-button>
         </el-form-item>
     </el-form>
 </template>
 
 <script setup lang="ts">
 import { reactive, watch } from 'vue';
+import { ElMessage } from 'element-plus';
 import { reqAddOrUpdateUser } from '@/api/sys/user'
 const props: any = defineProps({
     user: {
@@ -32,7 +32,12 @@ const props: any = defineProps({
     },
 
 });
-const userModel = reactive({});
+const userModel = reactive({
+    nickname: '',
+    phone: '',
+    email: '',
+    gender: ''
+});
 watch(() => props.user, (newUser) => {
     Object.assign(userModel, newUser);
 });
@@ -40,16 +45,10 @@ watch(() => props.user, (newUser) => {
 let submit = async () => {
     let res = await reqAddOrUpdateUser(userModel)
     if (res.code == 200) {
-        ElMessage({
-            type: 'success',
-            message: '更新成功',
-        })
         window.location.reload()
+        ElMessage({ type: 'success', message: res.message })
     } else {
-        ElMessage({
-            type: 'error',
-            message: '更新失败',
-        })
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 </script>

@@ -53,9 +53,9 @@
 import { ref, onMounted, reactive } from 'vue'
 import userInfo from "./components/userInfo.vue";
 import resetPwd from "./components/resetPwd.vue";
-import userAvatar from "./components/userAvatar.vue";
 import { reqUserInfo } from '@/api/user'
 import { reqAddOrUpdateUser } from '@/api/sys/user'
+import { ElMessage, UploadProps } from 'element-plus';
 const size = ref('')
 const activeTab = ref("userinfo");
 //组件挂载完毕
@@ -80,28 +80,22 @@ const getHas = async () => {
 let updateAvatar = async () => {
     let res = await reqAddOrUpdateUser(Params)
     if (res.code == 200) {
-        ElMessage({
-            type: 'success',
-            message: '更新成功',
-        })
         window.location.reload()
+        ElMessage({ type: 'success', message: res.message })
     } else {
-        ElMessage({
-            type: 'error',
-            message: '更新失败',
-        })
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 
 
 //图片上传成功的钩子
-const handleAvatarSuccess: UploadProps['onSuccess'] = (response) => {
+const handleAvatarSuccess: UploadProps['onSuccess'] = (response: any) => {
     //上传返回的数据 图片url  uploadFile
     Params.avatar = response.data;
     updateAvatar()
 }
 //上传图片之前出发的钩子函数
-const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile) => {
+const beforeAvatarUpload: UploadProps['beforeUpload'] = (rawFile: any) => {
     if (
         rawFile.type === 'image/png' ||
         rawFile.type === 'image/jpeg' ||

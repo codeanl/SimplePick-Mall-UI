@@ -262,8 +262,10 @@ const deletePlace = async (id: number) => {
     const requestData: any = { ids: ids.value };
     let res: any = await reqRemovePlace(requestData);
     if (res.code == 200) {
-        ElMessage({ type: 'success', message: '删除成功' })
         getHasPlace(listArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 //批量删除用户按钮
@@ -274,8 +276,10 @@ const deleteSelect = async () => {
     const requestData: any = { ids: ids.value };
     let res: any = await reqRemovePlace(requestData);
     if (res.code === 200) {
-        ElMessage({ type: 'success', message: '删除成功' })
         getHasPlace(listArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 //重置按钮
@@ -327,20 +331,17 @@ const save = async () => {
     let res: any = await reqAddOrUpdate(Params)
     if (res.code == 200) {
         drawer.value = false
-        ElMessage({
-            type: 'success',
-            message: Params.id ? '更新成功' : '添加成功',
-        })
+        ElMessage({ type: 'success', message: res.message })
+
         // window.location.reload()
         getHasPlace()
     } else {
         drawer.value = false
-        ElMessage({
-            type: 'error',
-            message: Params.id ? '更新失败' : '添加失败',
-        })
+        ElMessage({ type: 'error', message: res.message })
+
     }
 }
+
 import type { UploadProps } from 'element-plus'
 //图片上传成功的钩子
 const handleAvatarSuccess: UploadProps['onSuccess'] = (response) => {
@@ -380,7 +381,9 @@ let handleChange = async (row: any) => {
     }
     let res = await reqAddOrUpdate(data)
     if (res.code === 200) {
-        ElMessage({ type: 'success', message: '修改状态成功' })
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 
@@ -403,6 +406,9 @@ const getHas1 = async (pager = 1) => {
     if (res.code == 200) {
         total1.value = res.total
         listArr1.value = res.data
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 
@@ -442,12 +448,11 @@ let notOk = async () => {
         approvalTime: currentDateTime,
     })
     if (res.code === 200) {
-        ElMessage({
-            type: 'success',
-            message: Params.id ? '更新成功' : '添加成功',
-        })
         drawer2.value = false
         getHas1()
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 import { reqAddOrUpdateUser } from '@/api/sys/user'
@@ -489,7 +494,6 @@ let ok = async () => {
             getHas1()
             getHasPlace()
         }
-
     }
 }
 </script>

@@ -148,6 +148,9 @@ const getHasRole = async (pager = 1) => {
     if (res.code === 200) {
         total.value = res.total
         allRole.value = res.data
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 
@@ -189,7 +192,7 @@ const updateRole = (row: RoleData) => {
 }
 
 //表单校验
-const validateName = (value: any, callBack: any) => {
+const validateName = (rule: any, value: any, callBack: any) => {
     if (value.trim().length >= 2) {
         callBack()
     } else {
@@ -205,12 +208,11 @@ const save = async () => {
     await form.value.validate()
     let res: any = await reqAddOrUpdateRole(RoleParams)
     if (res.code === 200) {
-        ElMessage({
-            type: 'success',
-            message: RoleParams.id ? '更新成功' : '添加成功',
-        })
         dialogVisible.value = false
         getHasRole(RoleParams.id ? pageNo.value : 1)//更新留在当前 添加回到1
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 //分配权限按钮
@@ -264,11 +266,10 @@ const handler = async () => {
     let res: any = await reqUpdateRoleMenu({ roleId: roleId, menuIds: permissionId })
     if (res.code === 200) {
         drawer.value = false
-        ElMessage({
-            type: 'success',
-            message: '分配权限成功',
-        })
         window.location.reload()
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 
@@ -278,11 +279,10 @@ const removeRole = async (id: number) => {
     const requestData: any = { ids: ids.value }; // 提取 ids 引用的值并构造请求数据对象
     let res: any = await reqRemoveRole(requestData);
     if (res.code === 200) {
-        ElMessage({
-            type: 'success',
-            message: res.message,
-        })
         getHasRole(allRole.value.length > 1 ? pageNo.value : pageNo.value - 1)
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 
@@ -298,9 +298,11 @@ const deleteSelectRole = async () => {
     const requestData = { ids: ids.value };
     let res: any = await reqRemoveRole(requestData);
     if (res.code === 200) {
-        ElMessage({ type: 'success', message: '删除成功' })
         ids.value = []
         getHasRole(allRole.value.length > 1 ? pageNo.value : pageNo.value - 1)
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 </script>

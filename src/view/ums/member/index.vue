@@ -91,7 +91,7 @@
     </el-card>
     <!-- 抽屉  完成 添加｜修改 的窗口 -->
     <el-dialog v-model="drawer" :title="userParams.id ? '更新会员' : '添加会员'">
-        <el-form :model="userParams" :rules="rules" ref="formRef">
+        <el-form :model="userParams" ref="formRef">
             <el-form-item label="用户名" prop="username">
                 <el-input placeholder="请您输入用户名" v-model="userParams.username"></el-input>
             </el-form-item>
@@ -173,6 +173,7 @@
 import { reqMemberAll, reqAddOrUpdateMember, reqDeleteMember } from '@/api/ums/member'
 import { ref, onMounted, reactive, nextTick } from 'vue'
 import { reqMemberLoginLogAll, reqDeleteMemberLoginLog } from '@/api/ums/memberLoginLog'
+import { ElMessage } from 'element-plus';
 //默认页码
 let pageNo = ref<number>(1)
 //默认个数
@@ -229,6 +230,9 @@ const getHas = async (pager = 1) => {
     if (res.code == 200) {
         total.value = res.total
         ListArr.value = res.data
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 //下拉改变
@@ -319,18 +323,14 @@ const save = async () => {
     let res: any = await reqAddOrUpdateMember(userParams)
     if (res.code == 200) {
         drawer.value = false
-        ElMessage({
-            type: 'success',
-            message: userParams.id ? '更新成功' : '添加成功',
-        })
+        ElMessage({ type: 'success', message: res.message })
+
         getHas(userParams.id ? pageNo.value : 1)
         // window.location.reload()
     } else {
         drawer.value = false
-        ElMessage({
-            type: 'error',
-            message: userParams.id ? '更新失败' : '添加失败',
-        })
+        ElMessage({ type: 'error', message: res.message })
+
     }
 }
 // 删除用户按钮
@@ -339,20 +339,24 @@ const deleteUser = async (userId: number) => {
     const requestData: any = { ids: ids.value }; // 提取 ids 引用的值并构造请求数据对象
     let res: any = await reqDeleteMember(requestData);
     if (res.code == 200) {
-        ElMessage({ type: 'success', message: '删除成功' })
         getHas(ListArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 //批量删除用户按钮
 const deleteSelectUser = async () => {
-    ids.value = selectIdArr.value.map((item) => {
+    ids.value = selectIdArr.value.map((item: any) => {
         return item.id
     })
     const requestData: any = { ids: ids.value };
     let res: any = await reqDeleteMember(requestData);
     if (res.code === 200) {
-        ElMessage({ type: 'success', message: '删除成功' })
         getHas(ListArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 
@@ -378,6 +382,9 @@ let getLoginLog = async () => {
     if (res.code == 200) {
         total1.value = res.total
         loginLogListArr.value = res.data
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 //状态修改用户
@@ -388,7 +395,9 @@ let handleChange = async (row: any) => {
     }
     let res = await reqAddOrUpdateMember(data)
     if (res.code == 200) {
-        ElMessage({ type: 'success', message: '修改状态成功' })
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 // 删除按钮
@@ -398,8 +407,10 @@ const deleteLog = async (id: number) => {
     const requestData: any = { ids: ids.value }; // 提取 ids 引用的值并构造请求数据对象
     let res: any = await reqDeleteMemberLoginLog(requestData);
     if (res.code == 200) {
-        ElMessage({ type: 'success', message: '删除成功' })
         getLoginLog()
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 </script>

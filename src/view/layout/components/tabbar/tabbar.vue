@@ -59,7 +59,6 @@
 
 <script setup lang="ts">
 import useLayoutSettingStore from '@/store/setting'
-import { REMOVE_TOKEN } from '@/util/token'
 let layoutSettingStore = useLayoutSettingStore()
 import { useRoute } from 'vue-router'
 let $route = useRoute()

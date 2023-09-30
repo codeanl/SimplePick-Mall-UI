@@ -45,7 +45,7 @@ const rules = {
 import { useRouter } from 'vue-router'
 let router = useRouter()
 
-import { ElNotification } from 'element-plus'
+import { ElNotification, ElMessage } from 'element-plus'
 //获取当前时间段工具
 import { getTime } from "@/util/time"
 
@@ -70,10 +70,7 @@ const login = async () => {
             title: `Hi, ${getTime()}好`,
         })
     } catch (error) {
-        ElNotification({
-            type: 'error',
-            message: (error as Error).message,
-        })
+        ElMessage({ type: 'error', message: "登录失败" })
     }
 }
 </script>

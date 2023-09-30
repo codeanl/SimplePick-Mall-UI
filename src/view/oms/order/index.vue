@@ -138,12 +138,10 @@
     <!-- 订单详情 -->
     <el-dialog v-model="drawer" title="订单详情" width="70%">
         <el-steps :active="orderInfo?.status" align-center finish-status="success">
-            <!-- 0->待付款；1->待发货；2->已发货；3->确认收货；4->完成评价；5->无效订单 -->
             <el-step title="支付订单" description="Some description" />
-            <el-step title="平台发货" description="Some description" />
-            <el-step title="确认收货" description="Some description" />
-            <el-step title="完成评价" description="Some description" />
-            <el-step title="订单结束" description="Some description" />
+            <el-step title="运输中" description="Some description" />
+            <el-step title="已到店" description="Some description" />
+            <el-step title="订单完成" description="Some description" />
         </el-steps>
         <!--  -->
         <!-- 商品 -->
@@ -226,6 +224,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { reqOrderAll, reqOrderInfo, reqAddOrUpdateOrder } from '@/api/oms/order'
+import { ElMessage } from 'element-plus';
 //setting仓库
 import useLayoutSettingStore from '@/store/setting'
 let settingStore = useLayoutSettingStore()
@@ -267,6 +266,9 @@ const getHas = async (pager = 1) => {
     if (res.code == 200) {
         total.value = res.total
         listArr.value = res.data
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 //下拉改变
@@ -287,12 +289,15 @@ const reset = () => {
 //查看订单详情
 let look = async (row: any) => {
     drawer.value = true
-    let res = await reqOrderInfo({ id: row.id })
+    let res: any = await reqOrderInfo({ id: row.id })
     if (res.code === 200) {
         orderInfo.value = res.data.orderInfo
         skuList.value = res.data.skuList
         placeInfo.value = res.data.placeInfo
         merchantInfo.value = res.data.merchantInfo
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 let addone = async (row: any) => {
@@ -303,9 +308,12 @@ let addone = async (row: any) => {
     }
     let res = await reqAddOrUpdateOrder(data)
     if (res.code === 200) {
-        ElMessage({ type: 'success', message: '修改成功' })
+        ElMessage({ type: 'success', message: res.message })
         window.location.reload()
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
+
 }
 
 let getCurrentDateTime = () => {

@@ -102,13 +102,14 @@
 </template>
 
 <script setup lang="ts">
+import { ElMessage } from 'element-plus';
 import { ref, onMounted, reactive } from 'vue'
 import { reqsubjectList } from '@/api/sms/subject'
 import { reqsubjectProductList, reqRemovesubjectProduct, reqUpdate, reqAdd } from '@/api/sms/subjectProduct'
 import { reqAllProduct } from '@/api/pms/product'
 //setting仓库
-import useLayoutSettingStore from '@/store/setting'
-let settingStore = useLayoutSettingStore()
+// import useLayoutSettingStore from '@/store/setting'
+// let settingStore = useLayoutSettingStore()
 
 //默认页码
 let pageNo = ref<number>(1)
@@ -173,16 +174,13 @@ let getProductList = async () => {
     if (res.code === 200) {
         productArr.value = res.data
         total.value = res.total
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
-    console.log(nowSubject.value);
 
 }
 
-//搜索按钮
-const search = () => {
-    getProductList()
-    status.value = ''
-}
 //下拉改变
 const handler = () => {
     getProductList()
@@ -217,8 +215,10 @@ const deleteSubjectProduct = async (id: number) => {
     const requestData: any = { ids: ids.value };
     let res: any = await reqRemovesubjectProduct(requestData);
     if (res.code == 200) {
-        ElMessage({ type: 'success', message: '删除成功' })
         getProductList()
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 //批量删除用户按钮
@@ -229,12 +229,10 @@ const deleteSelectUser = async () => {
     const requestData: any = { ids: ids.value };
     let res: any = await reqRemovesubjectProduct(requestData);
     if (res.code === 200) {
-        ElMessage({
-            type: 'success',
-            message: res.message,
-            // message: '删除成功' 
-        })
         getProductList()
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 
@@ -255,9 +253,11 @@ const addHotRecommend = async () => {
     };
     let res: any = await reqAdd(requestData);
     if (res.code == 200) {
-        ElMessage({ type: 'success', message: '删除成功' })
         drawer.value = false
         getProductList()
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 
@@ -285,17 +285,11 @@ const save = async () => {
     if (res.code == 200) {
         drawer1.value = false
         getProductList()
-        ElMessage({
-            type: 'success',
-            message: Params.id ? '更新成功' : '添加成功',
-        })
+        ElMessage({ type: 'success', message: res.message })
     } else {
         drawer1.value = false
         getProductList()
-        ElMessage({
-            type: 'error',
-            message: Params.id ? '更新失败' : '添加失败',
-        })
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 let handleChange = async (row: any) => {
@@ -305,10 +299,9 @@ let handleChange = async (row: any) => {
     }
     let res = await reqUpdate(data)
     if (res.code === 200) {
-        ElMessage({
-            type: 'success',
-            message: res.message,
-        })
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 </script>

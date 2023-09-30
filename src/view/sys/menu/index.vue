@@ -118,6 +118,9 @@ const getHasPermission = async () => {
     let res: any = await reqAllPermission();
     if (res.code === 200) {
         PermissionArr.value = res.data;
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 };
 const PermissionArrWithRoot = computed(() => {
@@ -152,11 +155,10 @@ const save = async () => {
     let res: any = await reqAddOrUpdateMenu(menuData);
     if (res.code === 200) {
         dialogVisible.value = false;
-        ElMessage({
-            type: 'success',
-            message: menuData.id ? '更新成功' : '添加成功',
-        });
         getHasPermission();
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 };
 
@@ -166,10 +168,10 @@ const removeMenu = async (id: number) => {
     let res = await reqRemoveMenu(requestData);
     if (res.code == 200) {
         ids.value = [];
-        ElMessage({ type: 'success', message: '删除成功' });
         getHasPermission();
+        ElMessage({ type: 'success', message: res.message })
     } else {
-        ElMessage({ type: 'error', message: '删除失败' });
+        ElMessage({ type: 'error', message: res.message })
     }
 };
 

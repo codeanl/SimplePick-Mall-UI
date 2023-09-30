@@ -163,7 +163,8 @@
 <script setup lang="ts">
 import { ref, onMounted, reactive } from 'vue'
 import { reqAll, reqAddOrUpdate, reqRemove } from '@/api/pms/merchant'
-import { reqAllMerchantApply, reqAddOrUpdateMerchantApply, reqRemoveMerchantApply } from '@/api/pms/merchantApply'
+import { ElMessage } from 'element-plus';
+import { reqAllMerchantApply, reqAddOrUpdateMerchantApply } from '@/api/pms/merchantApply'
 const input = ref('')
 //分页数据
 let pageNo = ref<number>(1)
@@ -201,6 +202,9 @@ const getHas = async (pager = 1) => {
     if (res.code == 200) {
         total.value = res.total
         listArr.value = res.data
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 let applyStatus = ref<string>('0')
@@ -249,8 +253,10 @@ const deleteproduct = async (id: number) => {
     const requestData: any = { ids: ids.value };
     let res: any = await reqRemove(requestData);
     if (res.code == 200) {
-        ElMessage({ type: 'success', message: '删除成功' })
         getHas(listArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 //批量删除用户按钮
@@ -261,8 +267,10 @@ const deleteSelect = async () => {
     const requestData: any = { ids: ids.value };
     let res: any = await reqRemove(requestData);
     if (res.code === 200) {
-        ElMessage({ type: 'success', message: '删除成功' })
         getHas(listArr.value.length > 1 ? pageNo.value : pageNo.value - 1)
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 
@@ -327,16 +335,10 @@ const save = async () => {
     let res: any = await reqAddOrUpdate(Params)
     if (res.code == 200) {
         drawer.value = false
-        ElMessage({
-            type: 'success',
-            message: Params.id ? '更新成功' : '添加成功',
-        })
         getHas()
+        ElMessage({ type: 'success', message: res.message })
     } else {
-        ElMessage({
-            type: 'error',
-            message: Params.id ? '更新失败' : '添加失败',
-        })
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 import useLayoutSettingStore from '@/store/setting'
@@ -390,12 +392,11 @@ let notOk = async () => {
         approvalTime: currentDateTime,
     })
     if (res.code === 200) {
-        ElMessage({
-            type: 'success',
-            message: Params.id ? '更新成功' : '添加成功',
-        })
         drawer2.value = false
         getHas1()
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 import { reqAddOrUpdateUser } from '@/api/sys/user'
@@ -434,7 +435,9 @@ let ok = async () => {
                 userID: res2.data,
             })
         }
-
+        ElMessage({ type: 'success', message: res.message })
+    } else {
+        ElMessage({ type: 'error', message: res.message })
     }
 }
 //恢复到原来
