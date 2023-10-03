@@ -122,7 +122,7 @@
             <el-option label="已拒绝" value="2" />
         </el-select>
         <!-- 数据 -->
-        <el-table border :data="listArr1" @selection-change="selectChange">
+        <el-table border :data="listArr1" @selection-change="selectChange" style="margin:15px 0">
             <el-table-column label="id" align="center" prop="id" width="50px"></el-table-column>
             <el-table-column label="店铺图片" align="center" prop="pic" show-overflow-tooltip width="120px">
                 <template #="{ row }">

@@ -22,8 +22,13 @@ FROM nginx:latest as production-stage
 # 拷贝构建后的文件到 Nginx
 COPY --from=build-stage /app/dist /usr/share/nginx/html
 
+# 拷贝自定义的 Nginx 配置文件
+COPY nginx.conf /etc/nginx/nginx.conf
+
 # 暴露端口
 EXPOSE 80
+
+
 
 # 运行 Nginx
 CMD ["nginx", "-g", "daemon off;"]
