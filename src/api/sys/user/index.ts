@@ -10,7 +10,9 @@ enum API {
     DELETEALLUSER_URL = '/admin/acl/user/batchRemove',
     ALLROLEBYUSER_URl = '/api/sys/role/byUserList',
     UPDATEPWD_URl = '/api/sys/user/updatePassword',
-    resetPassword_url = '/api/sys/user/restartPassword'
+    resetPassword_url = '/api/sys/user/restartPassword',
+    rbac_url = '/api/sys/user/rbac'
+    
 }
 
 export const reqUserInfo = (current: number, pageSize: number, username: string, phone: string, nickname: string, status: string, gender: string, email: string) =>
@@ -23,6 +25,10 @@ export const reqAddOrUpdateUser = (data: any) => {
         return request.post<any, any>(API.ADDUSER_URL, data)
     }
 }
+
+export const Rbac = (data: any) =>
+    request.post<any, any>(API.rbac_url, data)
+
 export const reqAllRole = () =>
     request.get<any, any>(API.ALLROLEURL)
 

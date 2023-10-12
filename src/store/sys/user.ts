@@ -31,7 +31,8 @@ let useUserStore = defineStore('User', {
             username: '',
             avatar: '',
             buttons: [],
-            routes: []
+            routes: [],
+            roles:[],
         }
     },
     // 异步|逻辑的地方
@@ -47,17 +48,18 @@ let useUserStore = defineStore('User', {
                 SET_TOKEN(res.data as string)
                 return 'ok'
             } else {
-                return Promise.reject(new Error(res.data as string))
+                // return Promise.reject(new Error(res.data as string))
+                return res.message
             }
         },
         async userInfo() {
             let res: any = await reqUserInfo()
-
             if (res.code === 200) {
                 this.username = res.data.userInfo.username as string
                 this.avatar = res.data.userInfo.avatar as string
                 this.buttons = res.data.buttons
                 this.routes = res.data.routes
+                this.roles = res.data.roles
                 //计算用户展示的异步路由
                 let userAsyncRoute = filterAsyncRoute(
                     cloneDeep(asyncRoute),
@@ -73,19 +75,11 @@ let useUserStore = defineStore('User', {
             }
             else {
                 REMOVE_TOKEN()
-                return Promise.reject(new Error(res.message))
+                // return Promise.reject(new Error(res.message))
+                return res.message
             }
         },
         async userLogout() {
-            // let res = await reqLogout()
-            // if (res.code === 200) {
-            //     this.token = ''
-            //     this.username = ''
-            //     this.avatar = ''
-            //     REMOVE_TOKEN()
-            // } else {
-            //     return Promise.reject(new Error(res.message))
-            // }
             this.token = ''
             this.username = ''
             this.avatar = ''

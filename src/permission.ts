@@ -8,7 +8,6 @@ let userStore = useUserStore(pinia)
 import setting from './setting'
 // 全局前置守卫  保护访问路由的访问权限,也就是对路由权限进行控制
 // 只有在允许特定的情况下才能访问某个固定的路由,具备查看某些页面的权限,
-
 router.beforeEach(async (to, from, next) => {
     console.log(from);
     document.title = to.meta.title + ` | ${setting.title}`
@@ -43,5 +42,3 @@ router.afterEach((to: any, from: any) => {
     console.log(to + from);
     nprogress.done()
 })
-//未登录 可以访问login
-//登录成功 不可以访问login   

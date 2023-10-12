@@ -11,21 +11,20 @@
   </div>
 </template>
 
-
 <script setup lang="ts">
-import useLayoutSettingStore from '@/store/setting'
-import { watch, ref, nextTick } from 'vue'
-let layoutSettingStore = useLayoutSettingStore()
-let flag = ref(true)
+import useLayoutSettingStore from "@/store/setting";
+import { watch, ref, nextTick } from "vue";
+let layoutSettingStore = useLayoutSettingStore();
+let flag = ref(true);
 watch(
   () => layoutSettingStore.refresh,
   () => {
-    flag.value = false
+    flag.value = false;
     nextTick(() => {
-      flag.value = true
-    })
-  },
-)
+      flag.value = true;
+    });
+  }
+);
 </script>
 
 <style scoped>
